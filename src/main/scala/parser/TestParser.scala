@@ -7,7 +7,7 @@ object TestParser {
 
   private val visitor = new ASTBuilder
 
-  def parseTerm(input: String): Term = {
+  private def parseTerm(input: String): Term = {
     val inputStream = CharStreams.fromString(input)
     val lexer = new PcfLexer(inputStream)
     val tokens = new CommonTokenStream(lexer)
