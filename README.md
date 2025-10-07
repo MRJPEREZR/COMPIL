@@ -79,6 +79,23 @@ atom
     | CONST # Constant
     | '(' term ')' # Parentheses
     ;
+    
+FUN: 'fun';
+IFZ: 'ifz';
+THEN: 'then';
+ELSE: 'else';
+FIX: 'fix';
+LET: 'let';
+IN: 'in';
+
+PLUS: '+';
+MINUS: '-';
+MULT: '*';
+DIV: '/';
+
+CONST: '0' | [1-9][0-9]*;
+VAR: [a-z][a-z0-9]*;
+WS: [ \t\r\n]+ -> skip;
 ```
 
 # Generating ANTLR Parser Files
