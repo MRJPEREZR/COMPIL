@@ -14,6 +14,7 @@ letTerm
 
 funTerm
     : FUN VAR '->' term                 # Function
+    | FIX FUN VAR VAR '->' term         # FixFunction
     | addTerm                           # BinTerm
     ;
 

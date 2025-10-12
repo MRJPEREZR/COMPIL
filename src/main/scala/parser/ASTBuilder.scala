@@ -21,6 +21,14 @@ class ASTBuilder extends PcfBaseVisitor[Term] {
     Fix(name, body)
   }
 
+  // FIXFUN f x -> body
+  override def visitFixFunction(ctx: PcfParser.FixFunctionContext): Term = {
+    val funName = ctx.VAR(0).getText
+    val param = ctx.VAR(1).getText
+    val body = visit(ctx.term())
+    FixFunction(funName, param, body)
+  }
+
   // IFZ e1 THEN e2 ELSE e3
   override def visitIfZero(ctx: PcfParser.IfZeroContext): Term = {
     val cond = visit(ctx.term(0))

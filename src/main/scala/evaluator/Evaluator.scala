@@ -5,6 +5,7 @@ import parser._
 sealed trait Value
 case class IntValue(value: Int) extends Value
 case class Closure(param: String, body: Term, env: Env) extends Value
+case class IceCube(param: String, body: Term, env: Env) extends Value // recursive closure
 
 type Env = Map[String, Value]
 
@@ -42,7 +43,12 @@ object Evaluator {
       f match {
         case Closure(param, body, closureEnv) =>
           eval(body, closureEnv + (param -> v))
-        case _ => throw new RuntimeException(s"Cannot apply non-function: $f")
+        case IceCube(param, body, closureEnv) =>
+          // When applying a recursive function, ensure the function refers to itself
+          val recEnv = closureEnv + (param -> v)
+          eval(body, closureEnv + (param -> v) + ("fixself" -> f))
+        case _ =>
+          throw new RuntimeException(s"Cannot apply non-function: $f")
       }
 
     case IfZero(cond, thenBranch, elseBranch) =>
@@ -52,12 +58,27 @@ object Evaluator {
         case _ => throw new RuntimeException("Condition in ifz must be integer")
       }
 
-    case Fix(f, body) =>
-      lazy val closure: Value = eval(body, env + (f -> closure))
-      closure
+    case Fix(name, body) =>
+      // If the fix body is a function, wrap it as an IceCube
+      eval(body, env) match {
+        case Closure(param, innerBody, closureEnv) =>
+          // Create a recursive closure (IceCube)
+          lazy val recCube: IceCube = IceCube(param, innerBody, closureEnv + (name -> recCube))
+          recCube
+        case v =>
+          // If it's not a function, just fix the value itself
+          lazy val recVal: Value = v match {
+            case IceCube(p, b, e) => IceCube(p, b, e + (name -> recVal))
+            case _ => v
+          }
+          recVal
+      }
 
-    case Let(name, value, in) =>
+    case FixFunction(name, param, body) =>
+      eval(Fix(name, Function(param, body)), env)
+
+    case Let(name, value, body) =>
       val v = eval(value, env)
-      eval(in, env + (name -> v))
+      eval(body, env + (name -> v))
   }
 }

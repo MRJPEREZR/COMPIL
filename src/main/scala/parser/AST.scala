@@ -10,3 +10,4 @@ case class BinaryOperation(left: Term, op: String, right: Term) extends Term
 case class IfZero(cond: Term, thenBranch: Term, elseBranch: Term) extends Term
 case class Fix(param: String, body: Term) extends Term
 case class Let(name: String, value: Term, in: Term) extends Term
+case class FixFunction(name: String, param: String, body: Term) extends Term
