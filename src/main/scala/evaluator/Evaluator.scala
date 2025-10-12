@@ -5,7 +5,7 @@ import parser._
 sealed trait Value
 case class IntValue(value: Int) extends Value
 case class Closure(param: String, body: Term, env: Env) extends Value
-case class IceCube(param: String, body: Term, env: Env) extends Value // recursive closure
+case class IceCube(param: String, body: Term, env: Env) extends Value
 
 type Env = Map[String, Value]
 
