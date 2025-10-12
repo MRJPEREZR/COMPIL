@@ -21,7 +21,7 @@ class ASTBuilder extends PcfBaseVisitor[Term] {
     Fix(name, body)
   }
 
-  // FIXFUN f x -> body
+  // FIX FUN f x -> body
   override def visitFixFunction(ctx: PcfParser.FixFunctionContext): Term = {
     val funName = ctx.VAR(0).getText
     val param = ctx.VAR(1).getText
@@ -50,7 +50,7 @@ class ASTBuilder extends PcfBaseVisitor[Term] {
     terms.reduceLeft(parser.Application.apply)
   }
 
-  // MULT/DIV level
+  // MUL/DIV level
   override def visitMulDiv(ctx: PcfParser.MulDivContext): Term = {
     val terms = ctx.appTerm().asScala.map(visit)
     val ops = ctx.children.asScala.collect {
