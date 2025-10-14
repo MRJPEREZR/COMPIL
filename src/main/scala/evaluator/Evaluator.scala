@@ -5,7 +5,7 @@ import parser._
 sealed trait Value
 case class IntValue(value: Int) extends Value
 case class Closure(param: String, body: Term, env: Env) extends Value
-case class IceCube(param: String, body: Term, env: Env) extends Value
+case class IceCube(name: String, param: String, body: Term, env: Env) extends Value
 
 type Env = Map[String, Value]
 
@@ -13,8 +13,7 @@ object Evaluator {
 
   def eval(term: Term, env: Env = Map.empty): Value = term match {
 
-    case Constant(n) =>
-      IntValue(n)
+    case Constant(n) => IntValue(n)
 
     case Variable(x) =>
       env.getOrElse(x, throw new RuntimeException(s"Unbound variable: $x"))
@@ -38,17 +37,18 @@ object Evaluator {
       Closure(param, body, env)
 
     case Application(func, arg) =>
-      val f = eval(func, env)
-      val v = eval(arg, env)
-      f match {
+      eval(func, env) match {
         case Closure(param, body, closureEnv) =>
+          val v = eval(arg, env)
           eval(body, closureEnv + (param -> v))
-        case IceCube(param, body, closureEnv) =>
-          // When applying a recursive function, ensure the function refers to itself
-          val recEnv = closureEnv + (param -> v)
-          eval(body, closureEnv + (param -> v) + ("fixself" -> f))
+
+        case IceCube(name, param, body, closureEnv) =>
+          val v = eval(arg, env)
+          val recursiveEnv = closureEnv + (name -> IceCube(name, param, body, closureEnv))
+          eval(body, recursiveEnv + (param -> v))
+
         case _ =>
-          throw new RuntimeException(s"Cannot apply non-function: $f")
+          throw new RuntimeException(s"Cannot apply non-function: $func")
       }
 
     case IfZero(cond, thenBranch, elseBranch) =>
@@ -61,13 +61,13 @@ object Evaluator {
     case Fix(name, body) =>
       eval(body, env) match {
         case Closure(param, innerBody, closureEnv) =>
-          lazy val recCube: IceCube = IceCube(param, innerBody, closureEnv + (name -> recCube))
-          recCube
-        case v => v
+          IceCube(name, param, innerBody, closureEnv)
+        case _ =>
+          throw new RuntimeException(s"Fix expects a function, got: $body")
       }
 
     case FixFunction(name, param, body) =>
-      eval(Fix(name, Function(param, body)), env)
+      IceCube(name, param, body, env)
 
     case Let(name, value, body) =>
       val v = eval(value, env)

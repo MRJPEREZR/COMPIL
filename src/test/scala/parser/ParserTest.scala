@@ -76,4 +76,25 @@ class ParserTest extends AnyFunSuite {
       )
     )
   }
+  
+  test("let fact = fix fun f n -> ifz n then 1 else n * f (n - 1) in fact 4") {
+    testAst(
+      "let fact = fix fun f n -> ifz n then 1 else n * f (n - 1) in fact 4",
+      Let("fact",
+        FixFunction(
+          "f",
+          "n",
+          IfZero(
+            Variable("n"),
+            Constant(1),
+            BinaryOperation(Variable("n"),"*",Application(Variable("f"),BinaryOperation(Variable("n"),"-",Constant(1))))
+          )
+        ),
+        Application(
+          Variable("fact"),
+          Constant(4)
+        )
+      )
+    )
+  }
 }
