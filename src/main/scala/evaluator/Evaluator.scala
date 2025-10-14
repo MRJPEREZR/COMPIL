@@ -5,6 +5,7 @@ import parser._
 sealed trait Value
 case class IntValue(value: Int) extends Value
 case class Closure(param: String, body: Term, env: Env) extends Value
+case class IceCube(name: String, param: String, body: Term, env: Env) extends Value
 
 type Env = Map[String, Value]
 
@@ -12,8 +13,7 @@ object Evaluator {
 
   def eval(term: Term, env: Env = Map.empty): Value = term match {
 
-    case Constant(n) =>
-      IntValue(n)
+    case Constant(n) => IntValue(n)
 
     case Variable(x) =>
       env.getOrElse(x, throw new RuntimeException(s"Unbound variable: $x"))
@@ -37,12 +37,18 @@ object Evaluator {
       Closure(param, body, env)
 
     case Application(func, arg) =>
-      val f = eval(func, env)
-      val v = eval(arg, env)
-      f match {
+      eval(func, env) match {
         case Closure(param, body, closureEnv) =>
+          val v = eval(arg, env)
           eval(body, closureEnv + (param -> v))
-        case _ => throw new RuntimeException(s"Cannot apply non-function: $f")
+
+        case IceCube(name, param, body, closureEnv) =>
+          val v = eval(arg, env)
+          val recursiveEnv = closureEnv + (name -> IceCube(name, param, body, closureEnv))
+          eval(body, recursiveEnv + (param -> v))
+
+        case _ =>
+          throw new RuntimeException(s"Cannot apply non-function: $func")
       }
 
     case IfZero(cond, thenBranch, elseBranch) =>
@@ -52,12 +58,19 @@ object Evaluator {
         case _ => throw new RuntimeException("Condition in ifz must be integer")
       }
 
-    case Fix(f, body) =>
-      lazy val closure: Value = eval(body, env + (f -> closure))
-      closure
+    case Fix(name, body) =>
+      eval(body, env) match {
+        case Closure(param, innerBody, closureEnv) =>
+          IceCube(name, param, innerBody, closureEnv)
+        case _ =>
+          throw new RuntimeException(s"Fix expects a function, got: $body")
+      }
 
-    case Let(name, value, in) =>
+    case FixFunction(name, param, body) =>
+      IceCube(name, param, body, env)
+
+    case Let(name, value, body) =>
       val v = eval(value, env)
-      eval(in, env + (name -> v))
+      eval(body, env + (name -> v))
   }
 }

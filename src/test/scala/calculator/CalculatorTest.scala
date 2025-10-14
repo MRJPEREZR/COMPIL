@@ -57,4 +57,8 @@ class CalculatorTest extends AnyFunSuite {
   test("let cond = ifz 4 - 2 then 3 - 2 * 2 else 1 in 2 / cond → 2") {
     assert(evalExpr("let cond = ifz 4 - 2 then 3 - 2 * 2 else 1 in 2 / cond") == IntValue(2))
   }
+  
+  test("let fact = fix fun f n -> ifz n then 1 else n * f (n - 1) in fact 4 → 24") {
+    assert(evalExpr("let fact = fix fun f n -> ifz n then 1 else n * f (n - 1) in fact 4") == IntValue(24))
+  }
 }
