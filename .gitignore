@@ -1,2 +1,4 @@
 .idea/
 out/
+src/main/java/parserANTLR/*
+COMPIL.iml
