@@ -2,6 +2,7 @@ package calculator
 
 import parser._
 import evaluator._
+import typer._
 import org.antlr.v4.runtime._
 import parserANTLR._
 
@@ -29,8 +30,10 @@ object Calculator {
           val ast = parseTerm(line)
           println(s"AST: $ast")
 
+          val typ = Typer.eval(ast, Map())
+
           val result = Evaluator.eval(ast)
-          println(s"Result: $result\n")
+          println(s"Result: ${result}: ${typ}\n")
         } catch {
           case e: Exception =>
             println(s"Error: ${e.getMessage}\n")

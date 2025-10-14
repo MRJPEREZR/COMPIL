@@ -1,5 +1,7 @@
 package parser
 
+import typer._
+
 sealed trait Term
 
 case class Variable(name: String) extends Term
