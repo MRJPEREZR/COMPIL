@@ -59,19 +59,11 @@ object Evaluator {
       }
 
     case Fix(name, body) =>
-      // If the fix body is a function, wrap it as an IceCube
       eval(body, env) match {
         case Closure(param, innerBody, closureEnv) =>
-          // Create a recursive closure (IceCube)
           lazy val recCube: IceCube = IceCube(param, innerBody, closureEnv + (name -> recCube))
           recCube
-        case v =>
-          // If it's not a function, just fix the value itself
-          lazy val recVal: Value = v match {
-            case IceCube(p, b, e) => IceCube(p, b, e + (name -> recVal))
-            case _ => v
-          }
-          recVal
+        case v => v
       }
 
     case FixFunction(name, param, body) =>
