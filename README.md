@@ -9,6 +9,10 @@ It includes:
 - An evaluator for expressions
 - A test suite for parsing and evaluation
 
+## To test
+
+Please run the main function located at `src/main/scala/calculator/Calculator`. There we call the parser and evaluator objects to prompt the final expression parsed and its result evaluated. 
+
 ## Project Structure
 
 ```sh
@@ -130,9 +134,9 @@ Test files are located under src/test/scala:
 * parser/ParserTest.scala — validates parsing (AST structure)
 * calculator/CalculatorTest.scala — validates full evaluation
 
-**Dependency:** Make sure you have ScalaTest 3.2.19 configured in your project.
+**Dependency:** Make sure you have ScalaTest 3.2.19 (org.scalatest:scalatest_3:3.2.19) configured in your project.
 
-Test case example:
+Test case examples:
 
 ```sh
 > let x = 1 in x + 1
@@ -140,4 +144,12 @@ AST:
 Let(x, Constant(1), BinaryOperation(Variable(x), +, Constant(1)))
 Result:
 IntValue(2)
+```
+
+```sh
+> let fact = fix fun f n -> ifz n then 1 else n * f (n - 1) in fact 4
+AST: 
+Let(fact,FixFunction(f,n,IfZero(Variable(n),Constant(1),BinaryOperation(Variable(n),*,Application(Variable(f),BinaryOperation(Variable(n),-,Constant(1)))))),Application(Variable(fact),Constant(4)))
+Result: 
+IntValue(24)
 ```
