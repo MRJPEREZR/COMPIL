@@ -1,11 +1,11 @@
-package calculator
+package pcf
 
 import parser._
 import evaluator._
 import org.antlr.v4.runtime._
 import parserANTLR._
 
-object Calculator {
+object Pcf {
 
   private val visitor = new ASTBuilder
 
@@ -19,7 +19,7 @@ object Calculator {
   }
 
   def main(args: Array[String]): Unit = {
-    println("PCF Calculator - Type expressions (Ctrl+D to exit):")
+    println("PCF Interpreter - Type expressions (Ctrl+D to exit):")
 
     Iterator
       .continually(scala.io.StdIn.readLine("> "))

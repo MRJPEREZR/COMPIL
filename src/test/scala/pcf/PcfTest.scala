@@ -1,4 +1,4 @@
-package calculator
+package pcf
 
 import org.antlr.v4.runtime._
 import parser._
@@ -6,7 +6,7 @@ import evaluator._
 import parserANTLR._
 import org.scalatest.funsuite.AnyFunSuite
 
-class CalculatorTest extends AnyFunSuite {
+class PcfTest extends AnyFunSuite {
 
   private val visitor = new ASTBuilder
 

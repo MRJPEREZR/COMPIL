@@ -33,3 +33,13 @@ object TestParser {
       }
   }
 }
+
+// (fun x -> 0) + 1 -> error
+// (fun y -> let x = 1 in x + 1) 41 -> 2
+// let minus = fun x -> fun y -> x - y in let g = minus 68 in g 2 -> 66
+// let id = fun x -> x in let inc = fun x -> x + 1 in id (inc 76) -> 77
+
+// fix x 1
+// fix x x
+// let count = fix f fun n -> ifz n then 0 else f (n - 1) in count 2
+// let multiply = fix m fun a -> fun b -> ifz a then 0 else b + m (a - 1) b in multiply 3 4
