@@ -1,13 +1,29 @@
 package typer
 
-import parser._
-import evaluator._
+import parser.*
+import evaluator.*
+import unify.TVar
 
 type TypeEnv = Map[String, Type]
 
 object Typer {
   def eval(t: Term, env: TypeEnv): Type = t match
     case Constant(_) => INT
+
+    case Variable(name) =>
+      env.getOrElse(name, throw new RuntimeException(s"Unbound variable: $name"))
+
+    case Let(name, value, body) =>
+      val valueType = eval(value, env)
+      eval(body, env + (name -> valueType))
+
+    //case Application(func, arg) =>
+      //val funcType = eval(func, env)
+      //funcType
+
+    //case Function(param, body) =>
+      //FUNCTION()
+      //eval(body, env + (param -> TVar()))
 
     case BinaryOperation(left, op, right) =>
       val leftType = eval(left, env)
