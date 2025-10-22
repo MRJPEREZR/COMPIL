@@ -1,21 +1,28 @@
 package pcf
 
-import parser._
-import evaluator._
-import org.antlr.v4.runtime._
-import parserANTLR._
+import parser.*
+import evaluator.*
+import org.antlr.v4.runtime.*
+import org.antlr.v4.runtime.tree.ParseTree
+import parserANTLR.*
+
+import java.io.ByteArrayInputStream
+import java.nio.charset.StandardCharsets
 
 object Pcf {
 
   private val visitor = new ASTBuilder
 
   private def parseTerm(input: String): Term = {
-    val inputStream = CharStreams.fromString(input)
-    val lexer = new PcfLexer(inputStream)
-    val tokens = new CommonTokenStream(lexer)
-    val parser = new PcfParser(tokens)
-    val tree = parser.term()
-    visitor.visit(tree)
+    val bytes = input.getBytes(StandardCharsets.UTF_8)
+    val stream = new ByteArrayInputStream(bytes)
+
+    try {
+      val tree: ParseTree = ConcreteParser.analyze(stream)
+      visitor.visit(tree)
+    } finally {
+      stream.close()
+    }
   }
 
   def main(args: Array[String]): Unit = {

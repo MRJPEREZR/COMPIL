@@ -23,7 +23,7 @@ public class ConcreteParser {
 
         // generating parse tree
         ParseTree tree = parser.term();
-        System.out.println("ANTLR Syntax Tree: " + tree.toStringTree(parser));
+        // System.out.println("ANTLR Syntax Tree: " + tree.toStringTree(parser));
         if (ErrorFlag.getFlag()) // exit in case of an error
             throw new SyntaxError(ErrorFlag.getMsg());
         else
