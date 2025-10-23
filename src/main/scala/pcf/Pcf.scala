@@ -1,6 +1,7 @@
 package pcf
 
 import parser.*
+import typer.*
 import evaluator.*
 import org.antlr.v4.runtime.*
 import org.antlr.v4.runtime.tree.ParseTree
@@ -35,7 +36,8 @@ object Pcf {
         try {
           val ast = parseTerm(line)
           println(s"AST: $ast")
-
+          val typ = Typer.eval(ast, Map())
+          println(s"Type: $typ\n")
           val result = Evaluator.eval(ast)
           println(s"Result: $result\n")
         } catch {
