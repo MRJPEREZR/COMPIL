@@ -37,7 +37,7 @@ object Pcf {
           val ast = parseTerm(line)
           println(s"AST: $ast")
           val typ = Typer.eval(ast, Map())
-          println(s"Type: $typ\n")
+          println(s"Type: $typ")
           val result = Evaluator.eval(ast)
           println(s"Result: $result\n")
         } catch {

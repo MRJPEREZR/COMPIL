@@ -46,17 +46,33 @@ object Typer {
       thenType === elseType
       thenType
 
+//    case Fix(name, body) =>
+//      val bodyType = eval(body, env)
+//      val resultType = TVar()
+//      val expectedBodyType = new FUNCTION(resultType, resultType)
+//      bodyType === expectedBodyType
+//      resultType
+
     case Fix(name, body) =>
-      val bodyType = eval(body, env)
       val resultType = TVar()
-      val expectedBodyType = new FUNCTION(resultType, resultType)
-      bodyType === expectedBodyType
+      val funcType = TVar() // Temporary variable for the function type
+      val newEnv = env + (name -> funcType)
+      val bodyType = eval(body, newEnv)
+      // body should evaluate to a function type (resultType -> resultType)
+      bodyType === new FUNCTION(resultType, resultType)
+      // Also, the function type should be the same as what we expect
+      funcType === new FUNCTION(resultType, resultType)
       resultType
 
-//    case FixFunction(name, param, body) =>
-//      val paramType = TVar()
-//      val bodyType = eval(body, env + (name -> new FUNCTION(paramType, bodyType)) + (param -> paramType))
-//      new FUNCTION(paramType, bodyType)
+    case FixFunction(name, param, body) =>
+      val paramType = TVar()
+      val funcType = TVar() // Temporary variable for the recursive function type
+      // Create environment with the recursive reference
+      val newEnv = env + (name -> funcType) + (param -> paramType)
+      val bodyType = eval(body, newEnv)
+      // Unify: funcType should be (paramType -> bodyType)
+      funcType === new FUNCTION(paramType, bodyType)
+      new FUNCTION(paramType, bodyType)
 
     case Let(name, value, body) =>
       val valueType = eval(value, env)
