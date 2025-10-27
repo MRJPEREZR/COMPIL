@@ -1,17 +1,25 @@
 # PCF Interpreter — ANTLR + Scala
 
+## Authors
+
+* PUNZANO CORIMBABA Leandro
+* PEREZ RAMIREZ Julian
+
+## Descriptions
+
 This project implements a small interpreter for the **PCF (Programming Computable Functions)** language using **ANTLR 4** for parsing and **Scala 3** for evaluation.
 
 It includes:
 - A grammar definition (`Pcf.g4`)
 - ANTLR-generated parser/lexer classes
 - An AST builder in Scala
-- An evaluator for expressions
+- A typer for parsed expressions
+- An evaluator for parsed and well-typed expressions
 - A test suite for parsing and evaluation
 
 ## To test
 
-Please run the main function located at `src/main/scala/calculator/Calculator`. There, we call the parser and evaluator objects to prompt the final expression parsed and its result evaluated. 
+Please run the main function located at `src/main/scala/pcf/Pcf.scala`. There, we call the parser, typer and evaluator objects to prompt the final expression parsed and its result evaluated. 
 
 According to the example provided, the test suite contains the following cases:
 
@@ -96,6 +104,12 @@ Result: IntValue(6)
 AST: Let(multiply,Fix(m,Function(a,Function(b,IfZero(Variable(a),Constant(0),BinaryOperation(Variable(b),+,Application(Application(Variable(m),BinaryOperation(Variable(a),-,Constant(1))),Variable(b))))))),Application(Application(Variable(multiply),Constant(3)),Constant(4)))
 Result: IntValue(12)
 ```
+Test files are located under src/test/scala:
+
+* parser/ParserTest.scala — validates parsing (AST structure)
+* pcf/PcfTest.scala — validates full evaluation
+
+**Dependency:** Make sure you have ScalaTest 3.2.19 (org.scalatest:scalatest_3:3.2.19) configured in your project.
 
 ## Project Structure
 
@@ -140,59 +154,6 @@ src
         └── PcfTest.scala
 ```
 
-# Grammar definition
-
-
-```antlr
-term
-    : letTerm
-    | binaryTerm
-    ;
-
-letTerm
-    : LET VAR '=' term IN term # Let
-    | FIX VAR term # Fix
-    | IFZ term THEN term ELSE term # IfZero
-    | funTerm # FuncTerm
-    ;
-
-funTerm
-    : FUN VAR '->' term # Function
-    | binaryTerm # BinTerm
-    ;
-
-binaryTerm
-    : appTerm (OP appTerm)* # BinaryOperation
-    ;
-
-appTerm
-    : atom+ # Application
-    ;
-
-atom
-    : VAR # Variable
-    | CONST # Constant
-    | '(' term ')' # Parentheses
-    ;
-    
-FUN: 'fun';
-IFZ: 'ifz';
-THEN: 'then';
-ELSE: 'else';
-FIX: 'fix';
-LET: 'let';
-IN: 'in';
-
-PLUS: '+';
-MINUS: '-';
-MULT: '*';
-DIV: '/';
-
-CONST: '0' | [1-9][0-9]*;
-VAR: [a-z][a-z0-9]*;
-WS: [ \t\r\n]+ -> skip;
-```
-
 # Generating ANTLR Parser Files
 
 To generate the Java parser and lexer classes under src/main/java/parserANTLR:
@@ -206,41 +167,28 @@ Make sure Output directory is set to:
 src/main/java/parserANTLR
 ```
 
-# Scala components
+# What is working?
 
-* AST.scala
-  Defines the abstract syntax tree (AST) for PCF terms:
-* ASTBuilder.scala
-  A visitor that walks the ANTLR parse tree and constructs the AST in Scala.
-* Evaluator.scala
-  Interprets (evaluates) AST nodes in an environment.
-* Calculator.scala
-  Combines parsing + evaluation, printing both the AST and final result.
-  **Run this file to test the REPL and test your PCF expressions.**
+PCF blue, green and red are working totally, while PCF black is partially due to some misbehavior with FIX (it accepts only FUN as argument, not INT). At the same time, for typing, in some expressions it returns a generic value "X" because it is not able to reduce it to one root type.
 
-# Test Suite
-
-Test files are located under src/test/scala:
-
-* parser/ParserTest.scala — validates parsing (AST structure)
-* calculator/CalculatorTest.scala — validates full evaluation
-
-**Dependency:** Make sure you have ScalaTest 3.2.19 (org.scalatest:scalatest_3:3.2.19) configured in your project.
-
-Test case examples:
-
+# Polymorphism of `fun x -> x`
+The identity `fun x -> x` is polymorphic in the sense that it can be used with different types, but each particular use must have a consistent type.
 ```sh
-> let x = 1 in x + 1
-AST:
-Let(x, Constant(1), BinaryOperation(Variable(x), +, Constant(1)))
-Result:
-IntValue(2)
+> fun x -> x
+AST: Function(x,Variable(x))
+Type: (X0 -> X0)
+Result: Closure(x,Variable(x),Map())
+```
+For each application, the variable of type X0 is instantiated with the concrete type of the argument:
+
+Applied to 5 (INT): X0 becomes INT type (INT -> INT)
+```sh
+> let id = fun x -> x in id 5
+AST: Let(id,Function(x,Variable(x)),Application(Variable(id),Constant(5)))
+Type: Atom(INT)
+Result: IntValue(5)
 ```
 
-```sh
-> let fact = fix fun f n -> ifz n then 1 else n * f (n - 1) in fact 4
-AST: 
-Let(fact,FixFunction(f,n,IfZero(Variable(n),Constant(1),BinaryOperation(Variable(n),*,Application(Variable(f),BinaryOperation(Variable(n),-,Constant(1)))))),Application(Variable(fact),Constant(4)))
-Result: 
-IntValue(24)
-```
+# Use of Generative AI
+
+Yes, we used it in order to help us to fix some problems with Scala syntax (specially to implement recursion), and also to explain to us with concrete examples of how to use the ANTLR autogenerated code.
