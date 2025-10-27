@@ -16,13 +16,18 @@ object Typer {
     case Constant(_) => INT
 
     case Variable(x) =>
-      env.getOrElse(x, throw new RuntimeException(s"Unbound type variable: $x"))
+      env.getOrElse(x, throw new RuntimeException(s"Unbound variable: $x"))
 
     case BinaryOperation(left, op, right) =>
       val leftType = eval(left, env)
       val rightType = eval(right, env)
-      leftType === INT
-      rightType === INT
+
+      if (!(leftType === INT)) {
+        throw new RuntimeException(s"Left operand of '$op' must be INT, got: $leftType")
+      }
+      if (!(rightType === INT)) {
+        throw new RuntimeException(s"Right operand of '$op' must be INT, got: $rightType")
+      }
       INT
 
     case Function(param, body) =>
@@ -35,43 +40,50 @@ object Typer {
       val argType = eval(arg, env)
       val resultType = TVar()
       val expectedFuncType = new FUNCTION(argType, resultType)
-      funcType === expectedFuncType
+
+      if (!(funcType === expectedFuncType)) {
+        throw new RuntimeException(s"Cannot apply function of type $funcType to argument of type $argType")
+      }
       resultType
 
     case IfZero(cond, thenBranch, elseBranch) =>
       val condType = eval(cond, env)
       val thenType = eval(thenBranch, env)
       val elseType = eval(elseBranch, env)
-      condType === INT
-      thenType === elseType
-      thenType
 
-//    case Fix(name, body) =>
-//      val bodyType = eval(body, env)
-//      val resultType = TVar()
-//      val expectedBodyType = new FUNCTION(resultType, resultType)
-//      bodyType === expectedBodyType
-//      resultType
+      if (!(condType === INT)) {
+        throw new RuntimeException(s"Condition in ifz must be INT, got: $condType")
+      }
+      if (!(thenType === elseType)) {
+        throw new RuntimeException(s"Branches in ifz must have same type, got: $thenType and $elseType")
+      }
+      thenType
 
     case Fix(name, body) =>
       val resultType = TVar()
-      val funcType = TVar() // Temporary variable for the function type
+      val funcType = TVar()
       val newEnv = env + (name -> funcType)
       val bodyType = eval(body, newEnv)
-      // body should evaluate to a function type (resultType -> resultType)
-      bodyType === new FUNCTION(resultType, resultType)
-      // Also, the function type should be the same as what we expect
-      funcType === new FUNCTION(resultType, resultType)
+      val expectedBodyType = new FUNCTION(resultType, resultType)
+
+      if (!(bodyType === expectedBodyType)) {
+        throw new RuntimeException(s"Fixpoint body must be a recursive function (${resultType} -> ${resultType}), got: $bodyType")
+      }
+      if (!(funcType === expectedBodyType)) {
+        throw new RuntimeException(s"Recursive function type mismatch in fixpoint")
+      }
       resultType
 
     case FixFunction(name, param, body) =>
       val paramType = TVar()
-      val funcType = TVar() // Temporary variable for the recursive function type
-      // Create environment with the recursive reference
+      val funcType = TVar()
       val newEnv = env + (name -> funcType) + (param -> paramType)
       val bodyType = eval(body, newEnv)
-      // Unify: funcType should be (paramType -> bodyType)
-      funcType === new FUNCTION(paramType, bodyType)
+      val expectedFuncType = new FUNCTION(paramType, bodyType)
+
+      if (!(funcType === expectedFuncType)) {
+        throw new RuntimeException(s"Recursive function type mismatch in fix function")
+      }
       new FUNCTION(paramType, bodyType)
 
     case Let(name, value, body) =>
