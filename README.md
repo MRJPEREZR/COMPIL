@@ -130,7 +130,7 @@ src
 │       ├── pcf
 │       │   └── Pcf.scala
 │       └── typer
-│           └── Type.scala
+│           └── Typer.scala
 ├── Pcf.g4
 └── test
 └── scala
