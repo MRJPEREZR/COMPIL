@@ -3,6 +3,7 @@ package pcf
 import parser.*
 import typer.*
 import evaluator.*
+import generator.Generator
 import org.antlr.v4.runtime.*
 import org.antlr.v4.runtime.tree.ParseTree
 import parserANTLR.*
@@ -38,8 +39,16 @@ object Pcf {
           println(s"AST: $ast")
           val typ = Typer.eval(ast, Map())
           println(s"Type: $typ")
-          val result = Evaluator.eval(ast)
-          println(s"Result: $result\n")
+          if (args.contains("-i")) {
+            val result = Evaluator.eval(ast)
+            println(s"Result: $result\n")
+          }
+          else {
+            val genCode = Generator.gen(ast)
+            
+            println(s"Code: $genCode\n")
+          }
+            
         } catch {
           case e: Exception =>
             println(s"Error: ${e.getMessage}\n")
