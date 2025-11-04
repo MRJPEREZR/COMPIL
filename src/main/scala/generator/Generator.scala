@@ -14,7 +14,6 @@ object Generator:
         val c_u = gen(u)
         val c_v = gen(v)
         c_u ::: (Push  :: c_v) ::: List(gen_op(op))
-      case
     }
     
     def gen_op(op: String) = op match {
