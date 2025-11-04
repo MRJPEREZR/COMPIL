@@ -35,7 +35,8 @@ object Pcf {
 
   private def compile(in: String): List[Ins] =
     val term = parseTerm(in)
-    val code = Generator.gen(term)
+    val aTerm = Term.annotate(term, List())
+    val code = Generator.gen(aTerm)
     if check(term, code) then code
     else throw Exception("Implementation Error")
 
