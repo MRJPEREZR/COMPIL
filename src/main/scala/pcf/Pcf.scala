@@ -36,6 +36,7 @@ object Pcf {
   private def compile(in: String): List[Ins] =
     val term = parseTerm(in)
     val aTerm = Term.annotate(term, List())
+    println(s"annotated AST = $aTerm")
     val code = Generator.gen(aTerm)
     if check(term, code) then code
     else throw Exception("Implementation Error")
@@ -43,7 +44,7 @@ object Pcf {
   private def check(term: Term, code: List[Ins]): Boolean =
     val value = Evaluator.eval(term, Map())
     println(value)
-    //println(code) // in case the execution fails
+    println(code) // in case the execution fails
     val value2 = vm.VM.execute(code)
     value2.toString == value.toString // valid only for PCF green and blue
 

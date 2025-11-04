@@ -22,7 +22,7 @@ object Generator:
       case ALet (name: String, value: ATerm, in: ATerm) =>
         val t = gen(value)
         val u = gen(in)
-        PushEnv :: t ::: List(Extend) ::: u ::: List(Popenv) 
+        (PushEnv :: t) ::: List(Extend) ::: u ::: List(Popenv)
     }
     
     def gen_op(op: String) = op match {
