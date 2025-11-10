@@ -1,19 +1,25 @@
 package parser
 
+import java.io.ByteArrayInputStream
+import java.nio.charset.StandardCharsets
 import org.antlr.v4.runtime._
 import parserANTLR._
+import org.antlr.v4.runtime.tree.ParseTree
 
 object TestParser {
 
   private val visitor = new ASTBuilder
 
   private def parseTerm(input: String): Term = {
-    val inputStream = CharStreams.fromString(input)
-    val lexer = new PcfLexer(inputStream)
-    val tokens = new CommonTokenStream(lexer)
-    val parser = new PcfParser(tokens)
-    val tree = parser.term() // root rule
-    visitor.visit(tree)
+    val bytes = input.getBytes(StandardCharsets.UTF_8)
+    val stream = new ByteArrayInputStream(bytes)
+
+    try {
+      val tree: ParseTree = ConcreteParser.analyze(stream)
+      visitor.visit(tree)
+    } finally {
+      stream.close()
+    }
   }
 
   def main(args: Array[String]): Unit = {
