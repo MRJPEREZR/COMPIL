@@ -9,9 +9,14 @@ import scala.annotation.tailrec
 enum Value:
   case IntValue(n: Int)
   case ClosureValue(body: List[Ins], env: List[Value])
-  case EnvValue(env: List[Value])  // New wrapper for environments
+  case EnvValue(env: List[Value])
 
-// Environment is a list of values
+  override def toString: String = this match {
+    case IntValue(n) => s"IntValue($n)"
+    case ClosureValue(body, env) => "Closure" // Simplified for comparison
+    case EnvValue(env) => "EnvValue"
+  }
+
 type Env = List[Value]
 
 object VM:
@@ -21,6 +26,7 @@ object VM:
   @tailrec
   def execute(a: Value, s: List[Value], e: Env, c: List[Ins]): Value = (a, s, e, c) match {
     case (_, _, _, List()) => a
+
     case (_, _, _, Push :: c) => execute(a, a :: s, e, c)
     case (_, _, _, Ldi(n) :: c) => execute(IntValue(n), s, e, c)
 
@@ -38,36 +44,39 @@ object VM:
 
     // Environment operations
     case (_, s, e, PushEnv :: c) =>
-      // Push the current environment wrapped in EnvValue
       execute(EnvValue(e), s, e, c)
 
-    case (_, envValue :: s, _, Popenv :: c) =>
-      envValue match {
-        case EnvValue(savedEnv) => execute(a, s, savedEnv, c)
-        case _ => throw new Exception("Expected EnvValue on stack for Popenv")
-      }
+    // CORRECTED Popenv: restore environment from stack
+    case (result, EnvValue(savedEnv) :: s, _, Popenv :: c) =>
+      execute(result, s, savedEnv, c)
 
-    // Variable binding - extend environment with new value
-    case (_, value :: s, e, Extend(x) :: c) =>
-      // For now, we ignore the variable name 'x' and just extend environment
-      // In a complete implementation, you'd need proper name-to-index mapping
+    // Variable binding
+    case (value, s, e, Extend(x) :: c) =>
       execute(a, s, value :: e, c)
 
-    // Variable lookup - search in environment
-    case (_, s, e, Search(x) :: c) =>
-      // Simple implementation: use position in environment
-      // This is a placeholder - needs proper name resolution
-      if (e.nonEmpty) execute(e.head, s, e, c)
-      else throw new Exception(s"Unbound variable: $x")
+    // Variable Search
+    case (_, s, e, Search(index) :: c) =>
+      @tailrec
+      def SearchEnv(env: Env, idx: Int): Value = env match {
+        case head :: tail =>
+          if (idx == 0) head
+          else SearchEnv(tail, idx - 1)
+        case Nil => throw new Exception(s"Variable index out of bounds: $index")
+      }
+      execute(SearchEnv(e, index), s, e, c)
 
     // Closure creation
     case (_, s, e, Mkclos(body) :: c) =>
       execute(ClosureValue(body, e), s, e, c)
 
-    // Function application - FIXED: use EnvValue wrapper
-    case (ClosureValue(body, closureEnv), arg :: s, e, Apply :: c) =>
-      // Push current environment as EnvValue, setup new environment with argument
-      execute(a, EnvValue(e) :: s, arg :: closureEnv, body ::: (Popenv :: c))
+    // CORRECTED Function application
+    case (arg, closure :: s, e, Apply :: c) =>
+      closure match {
+        case ClosureValue(body, closureEnv) =>
+          // Save current environment and execute function body with new environment
+          execute(IntValue(0), EnvValue(e) :: s, arg :: closureEnv, body ::: c)
+        case _ => throw new Exception(s"Cannot apply non-closure: $closure")
+      }
 
     case _ => throw new Exception(s"unexpected VM state: ($a, $s, $e, $c)")
   }

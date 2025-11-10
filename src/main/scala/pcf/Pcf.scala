@@ -43,9 +43,11 @@ object Pcf {
 
   private def check(term: Term, code: List[Ins]): Boolean =
     val value = Evaluator.eval(term, Map())
-    println(value)
+    println(s"Evaluator result: $value")
     println(code) // in case the execution fails
     val value2 = vm.VM.execute(code)
+    println(s"VM result: $value2")
+    println(s"VM result type: ${value2.getClass}")
     value2.toString == value.toString // valid only for PCF green and blue
 
   def main(args: Array[String]): Unit = {
