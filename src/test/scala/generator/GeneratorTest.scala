@@ -42,7 +42,9 @@ object GeneratorTest {
     println(s"annotated AST = $aTerm")
     val code = Generator.gen(aTerm)
     val value = Evaluator.eval(term, Map())
+    val value1 = vm.VM.execute(code)
     println(s"Evaluator result: $value")
+    println(s"VM result: $value1")
     code
 //    if check(term, code) then code
 //    else throw Exception("Implementation Error")

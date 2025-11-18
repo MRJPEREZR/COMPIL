@@ -27,6 +27,19 @@ object Generator:
       val bodyCode = gen(body)
       List(PushEnv) ::: valueCode ::: List(Extend(name)) ::: bodyCode ::: List(Popenv)
 
+    case AFunction(param, body) =>
+      val bodyCode = gen(body)
+      List(Mkclos(bodyCode))
+
+    case AFixFunction(f, param, body) =>
+      val bodyCode = gen(body)
+      List(Mkclos(bodyCode)) // Note: fixfun uses same instruction as fun in this spec
+
+    case AApplication(func, arg) =>
+      val funcCode = gen(func)
+      val argCode = gen(arg)
+      List(PushEnv) ::: argCode ::: List(Push) ::: funcCode ::: List(Apply) ::: List(Popenv)
+
   }
 
   def gen_op(op: String): Ins = op match {
