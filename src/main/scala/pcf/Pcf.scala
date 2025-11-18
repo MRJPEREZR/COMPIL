@@ -47,7 +47,6 @@ object Pcf {
     println(code) // in case the execution fails
     val value2 = vm.VM.execute(code)
     println(s"VM result: $value2")
-    println(s"VM result type: ${value2.getClass}")
     value2.toString == value.toString // valid only for PCF green and blue
 
   def main(args: Array[String]): Unit = {
