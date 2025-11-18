@@ -9,6 +9,7 @@ import scala.annotation.tailrec
 enum Value:
   case IntValue(n: Int)
   case EnvValue(env: List[Value])
+  case ClosureValue(body: List[Ins], env: List[Value])
 
 type Env = List[Value]
 
@@ -57,7 +58,18 @@ object VM:
       }
       val value = nth(e, n)
       execute(value, s, e, c)
+    
+    // For red and black cases
+      
+    // Functions
+    case (_, s, e, Mkclos(body) :: c) =>
+      execute(ClosureValue(body, e), s, e, c)
 
+    // Function applications
+    case (ClosureValue(body, envClos), arg :: s, e, Apply :: c) =>
+      val newEnv = arg :: ClosureValue(body, envClos) :: envClos
+      execute(ClosureValue(body, envClos), s, newEnv, body ::: c)
+      
     // Other cases
     case _ => throw new Exception(s"unexpected VM state: ($a, $s, $e, $c)")
   }
