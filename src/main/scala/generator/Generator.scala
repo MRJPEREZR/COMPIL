@@ -4,11 +4,15 @@ import parser._
 import Ins.*
 
 type Code = List[Ins]
+type CodeWAT = List[WAT]
+enum WAT:
+  case Ins: String
+  case Test(code1: CodeWAT, code2: CodeWAT)
 
 object Generator:
   def gen(aterm: ATerm): String =
     genWAT(genAM(aterm))
-  
+
   def genAM(aterm: ATerm): Code = aterm match {
     case AConstant(n) => List(Ldi(n))
 
@@ -50,7 +54,7 @@ object Generator:
       // Push environment to accumulator, then push it to stack, then proceed
       List(PushEnv) ::: valueCode ::: List(Extend(name)) ::: bodyCode ::: List(Popenv)
   }
-  
+
   def genWAT(code: Code): String = ???
 
   def gen_op(op: String): Ins = op match {
