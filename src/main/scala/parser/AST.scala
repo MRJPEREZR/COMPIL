@@ -62,7 +62,12 @@ object Term {
         annotate(elseBranch, env)
       )
 
-    // fix x -> body
+    // fix x -> body (to support recursive function)
+    case Fix(name, Function(param, body)) =>
+      val newEnv = param :: name :: CLOS_PLACEHOLDER :: env
+      AFix(name, AFunction(param, annotate(body, newEnv)))
+
+    // fix x -> body (to support just vars)
     case Fix(param, body) =>
       val newEnv = param :: CLOS_PLACEHOLDER :: env
       AFix(param, annotate(body, newEnv))

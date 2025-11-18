@@ -42,8 +42,12 @@ object Generator:
       List(PushEnv) ::: gen(arg) ::: List(Push) ::: gen(func) ::: List(Apply, Popenv)
 
     // fix
-    case AFix(_, body) =>
-      List(Mkclos(gen(body)))
+    case AFix(_, func @ AFunction(param, funcBody)) =>
+      List(Mkclos(gen(funcBody)))
+
+    // fix case to support also vars (not only funcs)
+    case AFix(_, other) =>
+      List(Mkclos(gen(other)))
 
     // fix func
     case AFixFunction(_, _, body) =>
