@@ -8,12 +8,13 @@ import scala.annotation.tailrec
 
 enum Value:
   case IntValue(n: Int)
-  case ClosureValue(body: List[Ins], env: List[Value])
   case EnvValue(env: List[Value])
+  case ClosureValue(body: List[Ins], env: List[Value])
+
 
   override def toString: String = this match {
     case IntValue(n) => s"IntValue($n)"
-    case ClosureValue(body, env) => "Closure" // Simplified for comparison
+    case ClosureValue(body, env) => "Closure"
     case EnvValue(env) => "EnvValue"
   }
 
@@ -27,11 +28,15 @@ object VM:
   def execute(a: Value, s: List[Value], e: Env, c: List[Ins]): Value = (a, s, e, c) match {
     case (_, _, _, List()) => a
 
-    case (_, _, _, Push :: c) => execute(a, a :: s, e, c)
+    case (_, _, _, Push :: c) =>
+      println(s"DEBUG: Pushing $a onto stack")
+      execute(a, a :: s, e, c)
     case (_, _, _, Ldi(n) :: c) => execute(IntValue(n), s, e, c)
 
     // Binary operations
-    case (IntValue(n), IntValue(m) :: s, _, Add :: c) => execute(IntValue(m + n), s, e, c)
+    case (IntValue(n), IntValue(m) :: s, _, Add :: c) =>
+      println(s"DEBUG: Adding $m + $n = ${m + n}")
+      execute(IntValue(m + n), s, e, c)
     case (IntValue(n), IntValue(m) :: s, _, Sub :: c) => execute(IntValue(m - n), s, e, c)
     case (IntValue(n), IntValue(m) :: s, _, Mul :: c) => execute(IntValue(m * n), s, e, c)
     case (IntValue(n), IntValue(m) :: s, _, Div :: c) =>
@@ -44,39 +49,24 @@ object VM:
 
     // Environment operations
     case (_, s, e, PushEnv :: c) =>
-      execute(EnvValue(e), s, e, c)
+      execute(a, EnvValue(e) :: s, e, c)
 
-    // CORRECTED Popenv: restore environment from stack
+    // Popenv
     case (result, EnvValue(savedEnv) :: s, _, Popenv :: c) =>
       execute(result, s, savedEnv, c)
 
     // Variable binding
     case (value, s, e, Extend(x) :: c) =>
-      execute(a, s, value :: e, c)
+      execute(value, s, value :: e, c)
 
-    // Variable Search
-    case (_, s, e, Search(index) :: c) =>
-      @tailrec
-      def SearchEnv(env: Env, idx: Int): Value = env match {
-        case head :: tail =>
-          if (idx == 0) head
-          else SearchEnv(tail, idx - 1)
-        case Nil => throw new Exception(s"Variable index out of bounds: $index")
-      }
-      execute(SearchEnv(e, index), s, e, c)
+    // Variable lookup
+    case (_, s, value :: env, Search(0) :: c) =>
+      execute(value, s, e, c)
+    case (_, s, head :: env, Search(n) :: c) if n > 0 =>
+      execute(a, s, env, Search(n - 1) :: c)
 
-    // Closure creation
-    case (_, s, e, Mkclos(body) :: c) =>
-      execute(ClosureValue(body, e), s, e, c)
-
-    // CORRECTED Function application
-    case (arg, closure :: s, e, Apply :: c) =>
-      closure match {
-        case ClosureValue(body, closureEnv) =>
-          // Save current environment and execute function body with new environment
-          execute(IntValue(0), EnvValue(e) :: s, arg :: closureEnv, body ::: c)
-        case _ => throw new Exception(s"Cannot apply non-closure: $closure")
-      }
-
-    case _ => throw new Exception(s"unexpected VM state: ($a, $s, $e, $c)")
+    // Other cases
+    case _ =>
+      println(s"DEBUG: Unhandled state - acc: $a, stack: $s, env: $e, code: $c")
+      throw new Exception(s"unexpected VM state: ($a, $s, $e, $c)")
   }
