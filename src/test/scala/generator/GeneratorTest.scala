@@ -30,12 +30,6 @@ object GeneratorTest {
     }
   }
 
-  private def interpret(in: String): String =
-    val term = parseTerm(in)
-    val typ = Typer.eval(term, Map())
-    val value = Evaluator.eval(term, Map())
-    s"$value:$typ"
-
   private def compile(in: String): List[Ins] =
     val term = parseTerm(in)
     val aTerm = Term.annotate(term, List())
@@ -46,15 +40,6 @@ object GeneratorTest {
     println(s"Evaluator result: $value")
     println(s"VM result: $value1")
     code
-//    if check(term, code) then code
-//    else throw Exception("Implementation Error")
-
-//  private def check(term: Term, code: List[Ins]): Boolean =
-//    val value = Evaluator.eval(term, Map())
-//    println(s"Evaluator result: $value")
-//    println(code)
-//    val value2 = vm.VM.execute(code)
-//    value2.toString == value.toString
 
   def main(args: Array[String]): Unit = {
     val directory = "./src/test/scala/generator"
@@ -94,15 +79,6 @@ object GeneratorTest {
         }
 
         println(s"File content:\n$content")
-        println("-" * 40)
-
-        // Test interpretation
-        try {
-          val interpreted = interpret(content)
-          println(s"Interpreted result: $interpreted")
-        } catch {
-          case e: Exception => println(s"Interpretation failed: ${e.getMessage}")
-        }
 
         println("-" * 40)
 
