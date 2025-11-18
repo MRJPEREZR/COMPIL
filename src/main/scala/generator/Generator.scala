@@ -13,7 +13,7 @@ object Generator:
       List(Search(index))
 
     case ABinaryOperation(left, op, right) =>
-      gen(left) ::: List(Push) ::: gen(right) ::: List(gen_op(op))
+      gen(left) ::: gen(right) ::: List(gen_op(op))
 
     case AFunction(param, body) =>
       val bodyCode = gen(body)
@@ -22,7 +22,7 @@ object Generator:
       List(Mkclos(bodyCode ::: List(Popenv)))
 
     case AApplication(func, arg) =>
-      gen(func) ::: List(Push) ::: gen(arg) ::: List(Apply)
+      gen(func) ::: gen(arg) ::: List(Apply)
 
     case AIfZero(cond, thenBranch, elseBranch) =>
       val condCode = gen(cond)
@@ -45,7 +45,7 @@ object Generator:
       val valueCode = gen(value)
       val bodyCode = gen(body)
       // Push environment to accumulator, then push it to stack, then proceed
-      List(PushEnv, Push) ::: valueCode ::: List(Extend(name)) ::: bodyCode ::: List(Popenv)
+      List(PushEnv) ::: valueCode ::: List(Extend(name)) ::: bodyCode ::: List(Popenv)
   }
 
   def gen_op(op: String): Ins = op match {
