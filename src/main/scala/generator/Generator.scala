@@ -41,6 +41,10 @@ object Generator:
     case AApplication(func, arg) =>
       List(PushEnv) ::: gen(arg) ::: List(Push) ::: gen(func) ::: List(Apply, Popenv)
 
+    // fix
+    case AFix(_, body) =>
+      List(Mkclos(gen(body)))
+
     // fix func
     case AFixFunction(_, _, body) =>
       List(Mkclos(gen(body)))

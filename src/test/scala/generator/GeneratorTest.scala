@@ -42,7 +42,7 @@ object GeneratorTest {
 
   def main(args: Array[String]): Unit = {
     val directory = "./src/test/scala/generator"
-    val color = "red"
+    val color = "black"
     println(s"Testing all $color PCF files in directory: $directory")
     println("=" * 60)
 
