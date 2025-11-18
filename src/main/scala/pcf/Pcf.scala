@@ -3,12 +3,12 @@ package pcf
 import parser.*
 import typer.*
 import evaluator.*
-import generator._
+import generator.*
 import org.antlr.v4.runtime.*
 import org.antlr.v4.runtime.tree.ParseTree
 import parserANTLR.*
 
-import java.io.ByteArrayInputStream
+import java.io.{ByteArrayInputStream, FileWriter}
 import java.nio.charset.StandardCharsets
 
 object Pcf {
@@ -33,13 +33,28 @@ object Pcf {
     val value = Evaluator.eval(term, Map())
     s"$value:$typ"
 
-  private def compile(in: String): List[Ins] =
+  private def compile(verbose: Boolean, check_am: Boolean, in: String, filename: Option[String]): Unit =
     val term = parseTerm(in)
     val aTerm = Term.annotate(term, List())
     println(s"annotated AST = $aTerm")
-    val code = Generator.gen(aTerm)
-    if check(term, code) then code
-    else throw Exception("Implementation Error")
+
+    if check_am then
+      val code = Generator.genAM(aTerm)
+      if verbose then println(s"Code : $code")
+      if !check(term, code) then throw Exception("Implementation Error")
+    else
+      val code = Generator.gen(aTerm)
+      if filename.isDefined then write(code)
+      else println(code)
+
+    def write(code: String): String =
+      val WatFilename = filename.get.replaceFirst("\\.pcf\\z", ".wat")
+      if verbose then println("writing .wat code to " + WatFilename)
+      val out = new FileWriter(WatFilename)
+      out.write(code)
+      out.flush()
+      out.close()
+      WatFilename
 
   private def check(term: Term, code: List[Ins]): Boolean =
     val value = Evaluator.eval(term, Map())
@@ -53,13 +68,17 @@ object Pcf {
   def main(args: Array[String]): Unit = {
     println("PCF Interpreter - Type expressions (Ctrl+D to exit):")
 
+    val interp = args.contains("-i")
+    val verbose = args.length == 0 || args.length > 1 && args.contains("-v")
+    val check_am = args.contains("-vm")
+
     Iterator
       .continually(scala.io.StdIn.readLine("> "))
       .takeWhile(_ != null)
       .foreach { line =>
         try {
-          if (args.contains("-i")) println(s"==> ${interpret(line)}")
-          else println(compile(line))
+          if (interp) println(s"==> ${interpret(line)}")
+          else compile(verbose, check_am, line, None)
         } catch {
           case e: Exception =>
             println(s"Error: ${e.getMessage}\n")
