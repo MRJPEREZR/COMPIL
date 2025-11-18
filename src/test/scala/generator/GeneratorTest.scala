@@ -1,7 +1,6 @@
 package generator
 
 import parser.*
-import typer.*
 import evaluator.*
 import org.antlr.v4.runtime.*
 import org.antlr.v4.runtime.tree.ParseTree
@@ -100,3 +99,7 @@ object GeneratorTest {
     }
   }
 }
+
+// Test failing:
+// blue 8, 9
+// red20

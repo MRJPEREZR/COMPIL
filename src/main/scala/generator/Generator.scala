@@ -8,38 +8,46 @@ type Code = List[Ins]
 object Generator:
   def gen(aterm: ATerm): Code = aterm match {
 
-    case AVariable(x, index) =>
+    // variable annotated with De Bruijn index
+    case AVariable(_, index) =>
       List(Search(index))
 
-    case AConstant(n) => List(Ldi(n))
+    // integer constant
+    case AConstant(n) =>
+      List(Ldi(n))
 
+    // binary operation
     case ABinaryOperation(left, op, right) =>
       gen(left) ::: List(Push) ::: gen(right) ::: List(gen_op(op))
 
+    // conditional
     case AIfZero(cond, thenBranch, elseBranch) =>
       val condCode = gen(cond)
       val thenCode = gen(thenBranch)
       val elseCode = gen(elseBranch)
       condCode ::: List(Test(thenCode, elseCode))
 
-    case ALet(name, value, body) =>
+    // let
+    case ALet(_, value, body) =>
       val valueCode = gen(value)
       val bodyCode = gen(body)
-      List(PushEnv) ::: valueCode ::: List(Extend(name)) ::: bodyCode ::: List(Popenv)
+      List(PushEnv) ::: valueCode ::: List(Extend("")) ::: bodyCode ::: List(Popenv)
 
-    case AFunction(param, body) =>
-      val bodyCode = gen(body)
-      List(Mkclos(bodyCode))
+    // function 
+    case AFunction(_, body) =>
+      List(Mkclos(gen(body)))
 
-    case AFixFunction(f, param, body) =>
-      val bodyCode = gen(body)
-      List(Mkclos(bodyCode)) // Note: fixfun uses same instruction as fun in this spec
-
+    // application
     case AApplication(func, arg) =>
-      val funcCode = gen(func)
-      val argCode = gen(arg)
-      List(PushEnv) ::: argCode ::: List(Push) ::: funcCode ::: List(Apply) ::: List(Popenv)
+      List(PushEnv) ::: gen(arg) ::: List(Push) ::: gen(func) ::: List(Apply, Popenv)
 
+    // fix func
+    case AFixFunction(_, _, body) =>
+      List(Mkclos(gen(body)))
+
+    // unexpected cases
+    case other =>
+      throw new Exception(s"Generator: unsupported AST node: $other")
   }
 
   def gen_op(op: String): Ins = op match {
@@ -47,4 +55,5 @@ object Generator:
     case "-" => Sub
     case "*" => Mul
     case "/" => Div
+    case _ => throw new Exception(s"unknown binary operator: $op")
   }

@@ -25,7 +25,12 @@ case class ALet(name: String, value: ATerm, in: ATerm) extends ATerm
 case class AFixFunction(name: String, param: String, body: ATerm) extends ATerm
 
 object Term {
+
+  // closure itself.
+  private val CLOS_PLACEHOLDER = "<clos>"
+
   def annotate(term: Term, env: List[String]): ATerm = term match {
+
     case Variable(name) =>
       val idx = env.indexOf(name)
       if (idx == -1)
@@ -36,25 +41,45 @@ object Term {
     case Constant(value) =>
       AConstant(value)
 
+    // fun x -> body
     case Function(param, body) =>
-      AFunction(param, annotate(body, param :: env))
+      val newEnv = param :: CLOS_PLACEHOLDER :: env
+      AFunction(param, annotate(body, newEnv))
 
+    // t u
     case Application(func, arg) =>
       AApplication(annotate(func, env), annotate(arg, env))
 
+    // left op right
     case BinaryOperation(left, op, right) =>
       ABinaryOperation(annotate(left, env), op, annotate(right, env))
 
+    // ifz
     case IfZero(cond, thenBranch, elseBranch) =>
-      AIfZero(annotate(cond, env), annotate(thenBranch, env), annotate(elseBranch, env))
+      AIfZero(
+        annotate(cond, env),
+        annotate(thenBranch, env),
+        annotate(elseBranch, env)
+      )
 
+    // fix x -> body
     case Fix(param, body) =>
-      AFix(param, annotate(body, param :: env))
+      val newEnv = param :: CLOS_PLACEHOLDER :: env
+      AFix(param, annotate(body, newEnv))
 
+    // let x = value in body
     case Let(name, value, in) =>
-      ALet(name, annotate(value, env), annotate(in, name :: env))
+      ALet(
+        name,
+        annotate(value, env),
+        annotate(in, name :: env)
+      )
 
+    // fixfun f x -> body   (recursive function)
     case FixFunction(name, param, body) =>
-      AFixFunction(name, param, annotate(body, param :: name :: env))
+      val newEnv = param :: name :: env
+      AFixFunction(name, param, annotate(body, newEnv))
   }
 }
+
+
