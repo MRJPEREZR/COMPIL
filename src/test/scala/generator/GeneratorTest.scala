@@ -104,3 +104,11 @@ object GeneratorTest {
 // blue 8, 9
 // red20
 // black 4
+
+/*
+Binary operations in accumulator-free VM require that each side’s result be on the stack, without interfering with each other.
+
+Right now, generator for ABinaryOperation(left, op, right) just concatenates gen(left) ::: gen(right) ::: List(op)
+
+But if gen(left) is a function application, it leaves its result on top, gen(right) pushes arg and closure on top of that, then Apply pops arg/closure, but leftover values remain under — this corrupts stack for Add.
+*/
