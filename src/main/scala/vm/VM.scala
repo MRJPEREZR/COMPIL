@@ -23,10 +23,6 @@ object VM:
     case (result :: _, _, List()) => result
     case (Nil, _, List()) => throw new Exception("Empty stack at termination")
 
-    // push accumulator on value stack
-    case (s, _, Push :: c) =>
-      execute(s, e, c)
-
     // load integer into accumulator
     case (s, _, Ldi(n) :: c) =>
       execute(IntValue(n) :: s, e, c)

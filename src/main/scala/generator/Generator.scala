@@ -18,7 +18,7 @@ object Generator:
 
     // binary operation
     case ABinaryOperation(left, op, right) =>
-      gen(left) ::: List(Push) ::: gen(right) ::: List(gen_op(op))
+      gen(left) ::: gen(right) ::: List(gen_op(op))
 
     // conditional
     case AIfZero(cond, thenBranch, elseBranch) =>
@@ -39,7 +39,7 @@ object Generator:
 
     // application
     case AApplication(func, arg) =>
-      List(PushEnv) ::: gen(arg) ::: List(Push) ::: gen(func) ::: List(Apply, Popenv)
+      gen(func) ::: gen(arg) ::: List(Apply)
 
     // fix
     case AFix(_, func @ AFunction(param, funcBody)) =>
