@@ -106,6 +106,7 @@ object GeneratorTest {
 // black 4
 
 /*
+red13,18,20,42,43
 Binary operations in accumulator-free VM require that each side’s result be on the stack, without interfering with each other.
 
 Right now, generator for ABinaryOperation(left, op, right) just concatenates gen(left) ::: gen(right) ::: List(op)
