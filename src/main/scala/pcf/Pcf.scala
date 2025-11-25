@@ -37,6 +37,7 @@ object Pcf {
   def compile(verbose: Boolean, check_am: Boolean, in: String, filename: Option[String]): Unit =
     val term = parseTerm(in)
     val aTerm = Term.annotate(term, List())
+    print(s"file name: $filename \n")
     println(s"annotated AST = $aTerm")
 
     if check_am then
@@ -72,6 +73,7 @@ object Pcf {
     val interp = args.contains("-i")
     val verbose = args.length == 0 || args.length > 1 && args.contains("-v")
     val check_am = args.contains("-vm")
+    val pcfFilename: Option[String] = args.find(_.endsWith(".pcf"))
 
     val inputLines = if (args.exists(_.endsWith(".pcf"))) {
       val fileName = args.find(_.endsWith(".pcf")).get
@@ -99,7 +101,7 @@ object Pcf {
     inputLines.foreach { line =>
       try {
         if (interp) println(s"==> ${interpret(line)}")
-        else compile(verbose, check_am, line, None)
+        else compile(verbose, check_am, line, pcfFilename)
       } catch {
         case e: Exception =>
           println(s"Error: ${e.getMessage}\n")
