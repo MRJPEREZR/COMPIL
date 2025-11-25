@@ -33,7 +33,7 @@ object GeneratorTest {
     val term = parseTerm(in)
     val aTerm = Term.annotate(term, List())
     println(s"annotated AST = $aTerm")
-    val code = Generator.gen(aTerm)
+    val code = Generator.genAM(aTerm)
     val value = Evaluator.eval(term, Map())
     val value1 = vm.VM.execute(code)
     println(s"Evaluator result: $value")
@@ -41,8 +41,8 @@ object GeneratorTest {
     code
 
   def main(args: Array[String]): Unit = {
-    val directory = "./src/test/scala/generator"
-    val color = "red"
+    val directory = "./test/"
+    val color = "green"
     println(s"Testing all $color PCF files in directory: $directory")
     println("=" * 60)
 

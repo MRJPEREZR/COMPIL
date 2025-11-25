@@ -1,3 +1,0 @@
-let f = fun x -> 1 in
-let g = fun y -> 2 in
-3

@@ -1,2 +1,0 @@
-(fun x -> ifz x then 22 else x) 11
-

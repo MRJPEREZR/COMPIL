@@ -1,3 +1,0 @@
-let minus = fun x -> fun y -> x - y in
-let g = minus 68 in
-  g 2

@@ -1,2 +1,0 @@
-let inc = fun x -> x + 1 in inc 32
-
