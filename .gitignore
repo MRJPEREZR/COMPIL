@@ -1,4 +1,4 @@
 .idea/
 out/
 COMPIL.iml
-.wat
+*.wat
