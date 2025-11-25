@@ -16,12 +16,15 @@ object Generator:
     genWAT(genAM(aTerm))
 
   def genWAT(code: Code): String =
-    val pre = prelude()
+    val pre = prelude().trim
     val body = format(3, emit(code))
-    s"""$pre
-       |(func (export "main") (result i32)
+
+    s"""(module
+       |$pre
+       |
+       |  (func (export "main") (result i32)
        |$body
-       |  return)
+       |    return)
        |)
        |""".stripMargin
 
@@ -104,7 +107,10 @@ object Generator:
       sys.error("Apply not yet supported")
 
     case Test(thenC, elseC) =>
-      List(WAT.Test(emit(thenC), emit(elseC)))
+      List(
+        WAT.Ins("i32.eqz"),
+        WAT.Test(emit(thenC), emit(elseC))
+      )
 
   def genAM(aterm: ATerm): Code = aterm match {
 
