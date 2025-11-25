@@ -1,8 +1,9 @@
 package test
 
+import pcf.Pcf
+
 import java.io.File
 import scala.io.Source
-import pcf.PCF
 
 /**
  * @author Jacques Noye
@@ -42,7 +43,7 @@ trait Test {
       val cFile = new File(cFileName)
       val time0: Long = if (cFile.exists) cFile.lastModified else 0
       try
-        PCF.main(args0)
+        Pcf.main(args0)
       catch {
         case e: Exception => expectation match {
           case None =>

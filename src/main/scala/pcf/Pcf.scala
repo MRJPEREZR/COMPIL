@@ -8,6 +8,7 @@ import org.antlr.v4.runtime.*
 import org.antlr.v4.runtime.tree.ParseTree
 import parserANTLR.*
 
+import scala.io.Source
 import java.io.{ByteArrayInputStream, FileWriter}
 import java.nio.charset.StandardCharsets
 
@@ -68,23 +69,41 @@ object Pcf {
     value2.toString == value.toString // valid only for PCF green and blue
 
   def main(args: Array[String]): Unit = {
-    println("PCF Interpreter - Type expressions (Ctrl+D to exit):")
-
     val interp = args.contains("-i")
     val verbose = args.length == 0 || args.length > 1 && args.contains("-v")
     val check_am = args.contains("-vm")
 
-    Iterator
-      .continually(scala.io.StdIn.readLine("> "))
-      .takeWhile(_ != null)
-      .foreach { line =>
-        try {
-          if (interp) println(s"==> ${interpret(line)}")
-            else compile(verbose, check_am, line, None)
-        } catch {
-          case e: Exception =>
-            println(s"Error: ${e.getMessage}\n")
-        }
+    val inputLines = if (args.exists(_.endsWith(".pcf"))) {
+      val fileName = args.find(_.endsWith(".pcf")).get
+      val source = Source.fromFile(fileName)
+      val content = try {
+        source.mkString
+      } finally {
+        source.close()
       }
+      // Convert multi-line to single line and clean up
+      val singleLine = content
+        .replaceAll("//[^\n]*", "") // Remove line comments
+        .replaceAll("/\\*.*?\\*/", "") // Remove block comments (if any)
+        .replaceAll("\\s+", " ") // Normalize whitespace
+        .trim
+
+      if (singleLine.nonEmpty) List(singleLine) else List.empty
+    } else {
+      // Interactive mode - read from stdin
+      println("PCF Interpreter - Type expressions (Ctrl+D to exit):")
+      Iterator.continually(scala.io.StdIn.readLine("> ")).takeWhile(_ != null).toList
+    }
+
+    // Process all lines
+    inputLines.foreach { line =>
+      try {
+        if (interp) println(s"==> ${interpret(line)}")
+        else compile(verbose, check_am, line, None)
+      } catch {
+        case e: Exception =>
+          println(s"Error: ${e.getMessage}\n")
+      }
+    }
   }
 }

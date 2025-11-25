@@ -41,7 +41,7 @@ object GeneratorTest {
     code
 
   def main(args: Array[String]): Unit = {
-    val directory = "./test/"
+    val directory = "test/"
     val color = "green"
     println(s"Testing all $color PCF files in directory: $directory")
     println("=" * 60)

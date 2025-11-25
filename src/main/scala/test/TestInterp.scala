@@ -1,5 +1,5 @@
 package test
-import pcf.PCF
+import pcf.Pcf
 
 object TestInterp extends App:
   test("green0")
@@ -58,6 +58,6 @@ object TestInterp extends App:
     val args = Array(dir + filename + ".pcf", "-v", "-i")
     println(s"**********  ${args(0)}")
     try
-      PCF.main(args)
+      Pcf.main(args)
     catch
       case ex: Exception => println(s"${ex.getClass} ${ex.getMessage}")
