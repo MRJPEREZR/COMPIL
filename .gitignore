@@ -1,4 +1,6 @@
 .idea/
 out/
 COMPIL.iml
-*.wat
+test/*.wat
+test/*.txt
+test/*.wasm
