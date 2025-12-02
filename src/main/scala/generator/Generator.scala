@@ -147,14 +147,6 @@ object Generator:
     case AApplication(func, arg) =>
       genAM(func) ::: genAM(arg) ::: List(Apply)
 
-    // fix
-    case AFix(_, func @ AFunction(param, funcBody)) =>
-      List(Mkclos(genAM(funcBody)))
-
-    // fix case to support also vars (not only fun)
-    case AFix(_, other) =>
-      List(Mkclos(genAM(other)))
-
     // fix func
     case AFixFunction(_, _, body) =>
       List(Mkclos(genAM(body)))
