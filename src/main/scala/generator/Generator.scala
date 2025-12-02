@@ -13,15 +13,19 @@ enum WAT:
 object Generator:
 
   def gen(aTerm: ATerm): String =
-    genWAT(genAM(aTerm))
+    val (code, nClosures) = genAM(aTerm, 0)
+    genWAT(code, nClosures)
 
-  def genWAT(code: Code): String =
+  def genWAT(code: Code, nClosures: Int): String =
     val pre = prelude().trim
+    val table = emitTable(nClosures)
     val body = format(3, emit(code))
-    val tableSection = emitTable(closureMap.size)
+  
     s"""(module
        |$pre
-       |$tableSection
+       |
+       |$table
+       |
        |  (func (export "main") (result i32)
        |$body
        |    return)
@@ -100,16 +104,9 @@ object Generator:
         WAT.Ins("(global.get $ACC)")
       )
 
-    case Mkclos(body) =>
-      val idx = closureMap.find { case (i, b) => b == body }.map(_._1)
-        .getOrElse {
-          val newIdx = closureIndex
-          closureMap += (newIdx -> body)
-          closureIndex += 1
-          newIdx
-        }
+    case Mkclos(body, index) =>
       List(
-        WAT.Ins(s"(i32.const $idx)"),
+        WAT.Ins(s"(i32.const $index)"),
         WAT.Ins("(global.get $ENV)"),
         WAT.Ins("(call $pair)")
       )
@@ -132,7 +129,6 @@ object Generator:
     }
 
   def genAM(aterm: ATerm, idx: Int): (Code, Int) = aterm match {
-
     // variable annotated with De Bruijn index
     case AVariable(_, index) =>
       (List(Search(index)), idx)
@@ -163,7 +159,7 @@ object Generator:
     // function 
     case AFunction(_, body) =>
       val (bodyCode, newIdx) = genAM(body, idx)
-      (List(Mkclos(bodyCode)), newIdx)
+      (List(Mkclos(bodyCode, idx)), newIdx)
 
     // application
     case AApplication(func, arg) =>
@@ -174,7 +170,7 @@ object Generator:
     // fix func
     case AFixFunction(_, _, body) =>
       val (bodyCode, newIdx) = genAM(body, idx)
-      (List(Mkclos(bodyCode)), newIdx)
+      (List(Mkclos(bodyCode, idx)), newIdx)
 
     // unexpected cases
     case other =>
