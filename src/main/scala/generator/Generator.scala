@@ -18,10 +18,10 @@ object Generator:
   def genWAT(code: Code): String =
     val pre = prelude().trim
     val body = format(3, emit(code))
-
+    val tableSection = emitTable(closureMap.size)
     s"""(module
        |$pre
-       |
+       |$tableSection
        |  (func (export "main") (result i32)
        |$body
        |    return)
@@ -100,11 +100,22 @@ object Generator:
         WAT.Ins("(global.get $ACC)")
       )
 
-    case Mkclos(_) =>
-      sys.error("Closures are not required until Apply is implemented")
+    case Mkclos(body) =>
+      val idx = closureMap.find { case (i, b) => b == body }.map(_._1)
+        .getOrElse {
+          val newIdx = closureIndex
+          closureMap += (newIdx -> body)
+          closureIndex += 1
+          newIdx
+        }
+      List(
+        WAT.Ins(s"(i32.const $idx)"),
+        WAT.Ins("(global.get $ENV)"),
+        WAT.Ins("(call $pair)")
+      )
 
     case Apply =>
-      sys.error("Apply not yet supported")
+      List(WAT.Ins("(call $apply)"))
 
     case Test(thenC, elseC) =>
       List(
@@ -112,44 +123,58 @@ object Generator:
         WAT.Test(emit(thenC), emit(elseC))
       )
 
-  def genAM(aterm: ATerm): Code = aterm match {
+  private def emitTable(n: Int): String =
+    if n <= 0 then "" else {
+      val elems = (0 until n).mkString(" ")
+      s"""  (table funcref
+         |    (elem $elems)
+         |  )""".stripMargin
+    }
+
+  def genAM(aterm: ATerm, idx: Int): (Code, Int) = aterm match {
 
     // variable annotated with De Bruijn index
     case AVariable(_, index) =>
-      List(Search(index))
+      (List(Search(index)), idx)
 
     // integer constant
     case AConstant(n) =>
-      List(Ldi(n))
+      (List(Ldi(n)),idx)
 
     // binary operation
     case ABinaryOperation(left, op, right) =>
-      genAM(left) ::: genAM(right) ::: List(gen_op(op))
+      val (c1, idx1) = genAM(left, idx)
+      val (c2, idx2) = genAM(right, idx1)
+      (c1 ::: c2 ::: List(gen_op(op)), idx2)
 
     // conditional
     case AIfZero(cond, thenBranch, elseBranch) =>
-      val condCode = genAM(cond)
-      val thenCode = genAM(thenBranch)
-      val elseCode = genAM(elseBranch)
-      condCode ::: List(Test(thenCode, elseCode))
+      val (condCode, idx1) = genAM(cond, idx)
+      val (thenCode, idx2) = genAM(thenBranch, idx1)
+      val (elseCode, idx3) = genAM(elseBranch, idx2)
+      (condCode ::: List(Test(thenCode, elseCode)), idx3)
 
     // let
     case ALet(_, value, body) =>
-      val valueCode = genAM(value)
-      val bodyCode = genAM(body)
-      List(PushEnv) ::: valueCode ::: List(Extend("")) ::: bodyCode ::: List(Popenv)
+      val (valueCode, idx1) = genAM(value, idx)
+      val (bodyCode, idx2) = genAM(body, idx1)
+      (List(PushEnv) ::: valueCode ::: List(Extend("")) ::: bodyCode ::: List(Popenv), idx2)
 
     // function 
     case AFunction(_, body) =>
-      List(Mkclos(genAM(body)))
+      val (bodyCode, newIdx) = genAM(body, idx)
+      (List(Mkclos(bodyCode)), newIdx)
 
     // application
     case AApplication(func, arg) =>
-      genAM(func) ::: genAM(arg) ::: List(Apply)
+      val (funcCode, idx1) = genAM(func, idx)
+      val (argCode, idx2) = genAM(arg, idx1)
+      (funcCode ::: argCode ::: List(Apply), idx2)
 
     // fix func
     case AFixFunction(_, _, body) =>
-      List(Mkclos(genAM(body)))
+      val (bodyCode, newIdx) = genAM(body, idx)
+      (List(Mkclos(bodyCode)), newIdx)
 
     // unexpected cases
     case other =>

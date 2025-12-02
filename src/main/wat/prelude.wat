@@ -55,3 +55,19 @@
       (local.get $list)
       (call $head)))
   return)
+
+;; closure
+(func $apply (param $W i32)(param $C i32)(result i32)
+  (local $e i32) ;; the environment e stored in the closure
+  (local.get $W) ;; element 0 of the environment
+  (local.get $C) ;; element 1 of the environment
+;; retrieve the environment in the closure (2nd element of a pair)
+  (local.set $e (i32.load (i32.add (local.get $C)(i32.const 4))))
+;; extend the environment e to <W, <C, e>>
+  (local.get $e)
+  (call $cons)
+  (call $cons)
+  (global.set $ENV)
+;; retrieve index of closure body and execute the body
+(call_indirect (result i32) (i32.load (local.get $C)))
+)
