@@ -1,4 +1,4 @@
-// Generated from /home/jperezr/Documents/LOGIN/Compilation et Interpretation/TP - Interpreter/src/Pcf.g4 by ANTLR 4.13.2
+// Generated from C:/Users/leand/IdeaProjects/COMPIL/src/Pcf.g4 by ANTLR 4.13.2
 package parserANTLR;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
@@ -29,6 +29,18 @@ public interface PcfListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitLet(PcfParser.LetContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code FixFunction}
+	 * labeled alternative in {@link PcfParser#letTerm}.
+	 * @param ctx the parse tree
+	 */
+	void enterFixFunction(PcfParser.FixFunctionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code FixFunction}
+	 * labeled alternative in {@link PcfParser#letTerm}.
+	 * @param ctx the parse tree
+	 */
+	void exitFixFunction(PcfParser.FixFunctionContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code Fix}
 	 * labeled alternative in {@link PcfParser#letTerm}.
@@ -65,18 +77,6 @@ public interface PcfListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitFunction(PcfParser.FunctionContext ctx);
-	/**
-	 * Enter a parse tree produced by the {@code FixFunction}
-	 * labeled alternative in {@link PcfParser#funTerm}.
-	 * @param ctx the parse tree
-	 */
-	void enterFixFunction(PcfParser.FixFunctionContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code FixFunction}
-	 * labeled alternative in {@link PcfParser#funTerm}.
-	 * @param ctx the parse tree
-	 */
-	void exitFixFunction(PcfParser.FixFunctionContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code BinTerm}
 	 * labeled alternative in {@link PcfParser#funTerm}.

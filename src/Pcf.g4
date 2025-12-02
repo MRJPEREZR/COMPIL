@@ -8,13 +8,13 @@ term
 
 letTerm
     : LET VAR '=' term IN term          # Let
+    | FIX VAR FUN VAR '->' term         # FixFunction
     | FIX VAR term                      # Fix
     | IFZ term THEN term ELSE term      # IfZero
     ;
 
 funTerm
     : FUN VAR '->' term                 # Function
-    | FIX FUN VAR VAR '->' term         # FixFunction
     | addTerm                           # BinTerm
     ;
 
