@@ -12,25 +12,47 @@ enum WAT:
 
 object Generator:
 
-  def gen(aTerm: ATerm): String =
-    val (code, nClosures) = genAM(aTerm, 0)
-    genWAT(code, nClosures)
+  // For Mkclos and Apply implementation
+  def collectBodies(code: Code, bodiesSoFar: List[Code]): List[Code] =
+    // fold through the code, collect Mkclos bodies and recurse into tests
+    code.foldLeft(bodiesSoFar) { (acc, ins) =>
+      ins match
+        case Mkclos(body, idx) =>
+          // if body already present keep acc, otherwise append and recurse into body
+          val acc2 = if acc.contains(body) then acc else acc :+ body
+          // also collect nested closures inside the body itself
+          collectBodies(body, acc2)
 
-  def genWAT(code: Code, nClosures: Int): String =
-    val pre = prelude().trim
-    val table = emitTable(nClosures)
-    val body = format(3, emit(code))
-  
-    s"""(module
-       |$pre
-       |
-       |$table
-       |
-       |  (func (export "main") (result i32)
-       |$body
-       |    return)
-       |)
-       |""".stripMargin
+        case Test(t, e) =>
+          // collect in both branches
+          val accT = collectBodies(t, acc)
+          collectBodies(e, accT)
+
+        case _ => acc
+    }
+
+  def functionName(i: Int) = s"closure$i"
+
+  def emitTable(size: Int): String =
+    // produce a table with all closure function names
+    val elems = (0 until size).map(i => s"$$${functionName(i)}").mkString(" ")
+    s"""  (table ${size} funcref
+       |    (elem $elems)
+       |  )""".stripMargin
+
+  def emitFunctions(bodies: List[Code]): String =
+    // bodies.zipWithIndex -> emit each function
+    bodies.zipWithIndex.map { case (body, idx) =>
+      emitFunction(idx, body, bodies)
+    }.mkString("\n\n")
+
+  def emitFunction(idx: Int, body: Code, bodies: List[Code]): String =
+    val header = s"  (func $${functionName(idx)} (result i32)"
+    val inner = format(2, emit(body, bodies))
+    s"""$header
+       |$inner
+       |    return
+       |  )""".stripMargin
 
   def prelude(): String =
     val source = Source.fromFile("./src/main/wat/prelude.wat")
@@ -61,10 +83,10 @@ object Generator:
         ${spaces(depth + 1)}) ;; end else
         ${spaces(depth)}) ;; end if"""
 
-  def emit(code: Code): CodeWAT =
-    code.flatMap(emitIns)
+  def emit(code: Code, bodies: List[Code]): CodeWAT =
+    code.flatMap(emitIns(_, bodies))
 
-  def emitIns(ins: Ins): CodeWAT = ins match
+  def emitIns(ins: Ins, bodies: List[Code]): CodeWAT = ins match
     case Ldi(n) =>
       List(WAT.Ins(s"(i32.const $n)"))
 
@@ -105,6 +127,9 @@ object Generator:
       )
 
     case Mkclos(body, index) =>
+      val idx = bodies.indexOf(body)
+      if idx < 0 then
+        sys.error(s"Mkclos: body not found in bodies list (forgot to collect bodies)")
       List(
         WAT.Ins(s"(i32.const $index)"),
         WAT.Ins("(global.get $ENV)"),
@@ -117,16 +142,8 @@ object Generator:
     case Test(thenC, elseC) =>
       List(
         WAT.Ins("i32.eqz"),
-        WAT.Test(emit(thenC), emit(elseC))
+        WAT.Test(emit(thenC, bodies), emit(elseC, bodies))
       )
-
-  private def emitTable(n: Int): String =
-    if n <= 0 then "" else {
-      val elems = (0 until n).mkString(" ")
-      s"""  (table funcref
-         |    (elem $elems)
-         |  )""".stripMargin
-    }
 
   def genAM(aterm: ATerm, idx: Int): (Code, Int) = aterm match {
     // variable annotated with De Bruijn index
@@ -176,6 +193,51 @@ object Generator:
     case other =>
       throw new Exception(s"Generator: unsupported AST node: $other")
   }
+
+  def gen(aTerm: ATerm): String =
+    val (code, nClosures) = genAM(aTerm, 0)
+    genWAT(code, nClosures)
+
+  def genWAT(code: Code, nClosures: Int): String =
+    val pre = prelude().trim
+
+    // Closure bodies extracted from code
+    val bodies = collectBodies(code, Nil)
+
+    // The table must contain exactly "bodies.length" elements
+    val table =
+      if bodies.isEmpty then
+        // Empty but legal: table with size 0
+        "  (table 0 funcref)"
+      else
+        // Emit: (table N funcref (elem $body0 $body1 ...))
+        val elems =
+          bodies.indices.map(i => s"$${body$i}").mkString(" ")
+        s"""  (table ${bodies.length} funcref
+           |    (elem $elems)
+           |  )""".stripMargin
+
+    // Emit each closure body as a function definition
+    val functions =
+      if bodies.isEmpty then ""
+      else emitFunctions(bodies)
+
+    // Main code block
+    val body = format(3, emit(code, bodies))
+
+    s"""(module
+       |$pre
+       |
+       |$table
+       |
+       |$functions
+       |
+       |  ;; main program entry
+       |  (func (export "main") (result i32)
+       |$body
+       |    return)
+       |)
+       |""".stripMargin
 
   def gen_op(op: String): Ins = op match {
     case "+" => Add
