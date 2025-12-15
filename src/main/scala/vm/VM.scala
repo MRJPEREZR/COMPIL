@@ -63,7 +63,7 @@ object VM:
       execute(value :: s, e, c)
 
     // Make closure: accumulator becomes the closure <body, currentEnv>
-    case (s, e, Mkclos(body) :: c) =>
+    case (s, e, Mkclos(body, arity) :: c) =>
       execute(ClosureValue(body, e) :: s, e, c)
 
     // Apply
