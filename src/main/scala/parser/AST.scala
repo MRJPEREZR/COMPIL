@@ -20,7 +20,6 @@ case class AFunction(param: String, body: ATerm) extends ATerm
 case class AApplication(func: ATerm, arg: ATerm) extends ATerm
 case class ABinaryOperation(left: ATerm, op: String, right: ATerm) extends ATerm
 case class AIfZero(cond: ATerm, thenBranch: ATerm, elseBranch: ATerm) extends ATerm
-case class AFix(param: String, body: ATerm) extends ATerm
 case class ALet(name: String, value: ATerm, in: ATerm) extends ATerm
 case class AFixFunction(name: String, param: String, body: ATerm) extends ATerm
 
@@ -65,12 +64,11 @@ object Term {
     // fix x -> body (to support recursive function)
     case Fix(name, Function(param, body)) =>
       val newEnv = param :: name :: CLOS_PLACEHOLDER :: env
-      AFix(name, AFunction(param, annotate(body, newEnv)))
+      AFixFunction(name, param, AFunction(param, annotate(body, newEnv)))
 
     // fix x -> body (to support just vars)
     case Fix(param, body) =>
-      val newEnv = param :: CLOS_PLACEHOLDER :: env
-      AFix(param, annotate(body, newEnv))
+      throw new RuntimeException(s"fix point only supports functions")
 
     // let x = value in body
     case Let(name, value, in) =>

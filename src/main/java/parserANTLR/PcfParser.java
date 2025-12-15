@@ -1,4 +1,4 @@
-// Generated from /home/jperezr/Documents/LOGIN/Compilation et Interpretation/TP - Interpreter/src/Pcf.g4 by ANTLR 4.13.2
+// Generated from C:/Users/leand/IdeaProjects/COMPIL/src/Pcf.g4 by ANTLR 4.13.2
 package parserANTLR;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -225,6 +225,32 @@ public class PcfParser extends Parser {
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
+	public static class FixFunctionContext extends LetTermContext {
+		public TerminalNode FIX() { return getToken(PcfParser.FIX, 0); }
+		public List<TerminalNode> VAR() { return getTokens(PcfParser.VAR); }
+		public TerminalNode VAR(int i) {
+			return getToken(PcfParser.VAR, i);
+		}
+		public TerminalNode FUN() { return getToken(PcfParser.FUN, 0); }
+		public TermContext term() {
+			return getRuleContext(TermContext.class,0);
+		}
+		public FixFunctionContext(LetTermContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof PcfListener ) ((PcfListener)listener).enterFixFunction(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof PcfListener ) ((PcfListener)listener).exitFixFunction(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof PcfVisitor ) return ((PcfVisitor<? extends T>)visitor).visitFixFunction(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	@SuppressWarnings("CheckReturnValue")
 	public static class IfZeroContext extends LetTermContext {
 		public TerminalNode IFZ() { return getToken(PcfParser.IFZ, 0); }
 		public List<TermContext> term() {
@@ -255,10 +281,10 @@ public class PcfParser extends Parser {
 		LetTermContext _localctx = new LetTermContext(_ctx, getState());
 		enterRule(_localctx, 2, RULE_letTerm);
 		try {
-			setState(36);
+			setState(42);
 			_errHandler.sync(this);
-			switch (_input.LA(1)) {
-			case LET:
+			switch ( getInterpreter().adaptivePredict(_input,1,_ctx) ) {
+			case 1:
 				_localctx = new LetContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
@@ -276,8 +302,8 @@ public class PcfParser extends Parser {
 				term();
 				}
 				break;
-			case FIX:
-				_localctx = new FixContext(_localctx);
+			case 2:
+				_localctx = new FixFunctionContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(26);
@@ -285,29 +311,45 @@ public class PcfParser extends Parser {
 				setState(27);
 				match(VAR);
 				setState(28);
+				match(FUN);
+				setState(29);
+				match(VAR);
+				setState(30);
+				match(T__1);
+				setState(31);
 				term();
 				}
 				break;
-			case IFZ:
-				_localctx = new IfZeroContext(_localctx);
+			case 3:
+				_localctx = new FixContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(29);
-				match(IFZ);
-				setState(30);
-				term();
-				setState(31);
-				match(THEN);
 				setState(32);
-				term();
+				match(FIX);
 				setState(33);
-				match(ELSE);
+				match(VAR);
 				setState(34);
 				term();
 				}
 				break;
-			default:
-				throw new NoViableAltException(this);
+			case 4:
+				_localctx = new IfZeroContext(_localctx);
+				enterOuterAlt(_localctx, 4);
+				{
+				setState(35);
+				match(IFZ);
+				setState(36);
+				term();
+				setState(37);
+				match(THEN);
+				setState(38);
+				term();
+				setState(39);
+				match(ELSE);
+				setState(40);
+				term();
+				}
+				break;
 			}
 		}
 		catch (RecognitionException re) {
@@ -356,32 +398,6 @@ public class PcfParser extends Parser {
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
-	public static class FixFunctionContext extends FunTermContext {
-		public TerminalNode FIX() { return getToken(PcfParser.FIX, 0); }
-		public TerminalNode FUN() { return getToken(PcfParser.FUN, 0); }
-		public List<TerminalNode> VAR() { return getTokens(PcfParser.VAR); }
-		public TerminalNode VAR(int i) {
-			return getToken(PcfParser.VAR, i);
-		}
-		public TermContext term() {
-			return getRuleContext(TermContext.class,0);
-		}
-		public FixFunctionContext(FunTermContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PcfListener ) ((PcfListener)listener).enterFixFunction(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PcfListener ) ((PcfListener)listener).exitFixFunction(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof PcfVisitor ) return ((PcfVisitor<? extends T>)visitor).visitFixFunction(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	@SuppressWarnings("CheckReturnValue")
 	public static class BinTermContext extends FunTermContext {
 		public AddTermContext addTerm() {
 			return getRuleContext(AddTermContext.class,0);
@@ -413,26 +429,8 @@ public class PcfParser extends Parser {
 				_localctx = new FunctionContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(38);
-				match(FUN);
-				setState(39);
-				match(VAR);
-				setState(40);
-				match(T__1);
-				setState(41);
-				term();
-				}
-				break;
-			case FIX:
-				_localctx = new FixFunctionContext(_localctx);
-				enterOuterAlt(_localctx, 2);
-				{
-				setState(42);
-				match(FIX);
-				setState(43);
-				match(FUN);
 				setState(44);
-				match(VAR);
+				match(FUN);
 				setState(45);
 				match(VAR);
 				setState(46);
@@ -445,7 +443,7 @@ public class PcfParser extends Parser {
 			case CONST:
 			case VAR:
 				_localctx = new BinTermContext(_localctx);
-				enterOuterAlt(_localctx, 3);
+				enterOuterAlt(_localctx, 2);
 				{
 				setState(48);
 				addTerm();
@@ -845,8 +843,8 @@ public class PcfParser extends Parser {
 		"\u0000\u0003\u0000\u0012\b\u0000\u0001\u0001\u0001\u0001\u0001\u0001\u0001"+
 		"\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001"+
 		"\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001"+
-		"\u0001\u0001\u0001\u0003\u0001%\b\u0001\u0001\u0002\u0001\u0002\u0001"+
-		"\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0001\u0002\u0001"+
+		"\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001"+
+		"\u0001\u0001\u0001\u0003\u0001+\b\u0001\u0001\u0002\u0001\u0002\u0001"+
 		"\u0002\u0001\u0002\u0001\u0002\u0003\u00022\b\u0002\u0001\u0003\u0001"+
 		"\u0003\u0001\u0003\u0005\u00037\b\u0003\n\u0003\f\u0003:\t\u0003\u0001"+
 		"\u0004\u0001\u0004\u0001\u0004\u0005\u0004?\b\u0004\n\u0004\f\u0004B\t"+
@@ -854,7 +852,7 @@ public class PcfParser extends Parser {
 		"\u0001\u0006\u0001\u0006\u0001\u0006\u0001\u0006\u0001\u0006\u0003\u0006"+
 		"O\b\u0006\u0001\u0006\u0000\u0000\u0007\u0000\u0002\u0004\u0006\b\n\f"+
 		"\u0000\u0002\u0001\u0000\f\r\u0001\u0000\u000e\u000fT\u0000\u0011\u0001"+
-		"\u0000\u0000\u0000\u0002$\u0001\u0000\u0000\u0000\u00041\u0001\u0000\u0000"+
+		"\u0000\u0000\u0000\u0002*\u0001\u0000\u0000\u0000\u00041\u0001\u0000\u0000"+
 		"\u0000\u00063\u0001\u0000\u0000\u0000\b;\u0001\u0000\u0000\u0000\nD\u0001"+
 		"\u0000\u0000\u0000\fN\u0001\u0000\u0000\u0000\u000e\u0012\u0003\u0002"+
 		"\u0001\u0000\u000f\u0012\u0003\u0004\u0002\u0000\u0010\u0012\u0003\u0006"+
@@ -863,23 +861,23 @@ public class PcfParser extends Parser {
 		"\u0000\u0000\u0013\u0014\u0005\n\u0000\u0000\u0014\u0015\u0005\u0011\u0000"+
 		"\u0000\u0015\u0016\u0005\u0001\u0000\u0000\u0016\u0017\u0003\u0000\u0000"+
 		"\u0000\u0017\u0018\u0005\u000b\u0000\u0000\u0018\u0019\u0003\u0000\u0000"+
-		"\u0000\u0019%\u0001\u0000\u0000\u0000\u001a\u001b\u0005\t\u0000\u0000"+
-		"\u001b\u001c\u0005\u0011\u0000\u0000\u001c%\u0003\u0000\u0000\u0000\u001d"+
-		"\u001e\u0005\u0006\u0000\u0000\u001e\u001f\u0003\u0000\u0000\u0000\u001f"+
-		" \u0005\u0007\u0000\u0000 !\u0003\u0000\u0000\u0000!\"\u0005\b\u0000\u0000"+
-		"\"#\u0003\u0000\u0000\u0000#%\u0001\u0000\u0000\u0000$\u0013\u0001\u0000"+
-		"\u0000\u0000$\u001a\u0001\u0000\u0000\u0000$\u001d\u0001\u0000\u0000\u0000"+
-		"%\u0003\u0001\u0000\u0000\u0000&\'\u0005\u0005\u0000\u0000\'(\u0005\u0011"+
-		"\u0000\u0000()\u0005\u0002\u0000\u0000)2\u0003\u0000\u0000\u0000*+\u0005"+
-		"\t\u0000\u0000+,\u0005\u0005\u0000\u0000,-\u0005\u0011\u0000\u0000-.\u0005"+
-		"\u0011\u0000\u0000./\u0005\u0002\u0000\u0000/2\u0003\u0000\u0000\u0000"+
-		"02\u0003\u0006\u0003\u00001&\u0001\u0000\u0000\u00001*\u0001\u0000\u0000"+
-		"\u000010\u0001\u0000\u0000\u00002\u0005\u0001\u0000\u0000\u000038\u0003"+
-		"\b\u0004\u000045\u0007\u0000\u0000\u000057\u0003\b\u0004\u000064\u0001"+
-		"\u0000\u0000\u00007:\u0001\u0000\u0000\u000086\u0001\u0000\u0000\u0000"+
-		"89\u0001\u0000\u0000\u00009\u0007\u0001\u0000\u0000\u0000:8\u0001\u0000"+
-		"\u0000\u0000;@\u0003\n\u0005\u0000<=\u0007\u0001\u0000\u0000=?\u0003\n"+
-		"\u0005\u0000><\u0001\u0000\u0000\u0000?B\u0001\u0000\u0000\u0000@>\u0001"+
+		"\u0000\u0019+\u0001\u0000\u0000\u0000\u001a\u001b\u0005\t\u0000\u0000"+
+		"\u001b\u001c\u0005\u0011\u0000\u0000\u001c\u001d\u0005\u0005\u0000\u0000"+
+		"\u001d\u001e\u0005\u0011\u0000\u0000\u001e\u001f\u0005\u0002\u0000\u0000"+
+		"\u001f+\u0003\u0000\u0000\u0000 !\u0005\t\u0000\u0000!\"\u0005\u0011\u0000"+
+		"\u0000\"+\u0003\u0000\u0000\u0000#$\u0005\u0006\u0000\u0000$%\u0003\u0000"+
+		"\u0000\u0000%&\u0005\u0007\u0000\u0000&\'\u0003\u0000\u0000\u0000\'(\u0005"+
+		"\b\u0000\u0000()\u0003\u0000\u0000\u0000)+\u0001\u0000\u0000\u0000*\u0013"+
+		"\u0001\u0000\u0000\u0000*\u001a\u0001\u0000\u0000\u0000* \u0001\u0000"+
+		"\u0000\u0000*#\u0001\u0000\u0000\u0000+\u0003\u0001\u0000\u0000\u0000"+
+		",-\u0005\u0005\u0000\u0000-.\u0005\u0011\u0000\u0000./\u0005\u0002\u0000"+
+		"\u0000/2\u0003\u0000\u0000\u000002\u0003\u0006\u0003\u00001,\u0001\u0000"+
+		"\u0000\u000010\u0001\u0000\u0000\u00002\u0005\u0001\u0000\u0000\u0000"+
+		"38\u0003\b\u0004\u000045\u0007\u0000\u0000\u000057\u0003\b\u0004\u0000"+
+		"64\u0001\u0000\u0000\u00007:\u0001\u0000\u0000\u000086\u0001\u0000\u0000"+
+		"\u000089\u0001\u0000\u0000\u00009\u0007\u0001\u0000\u0000\u0000:8\u0001"+
+		"\u0000\u0000\u0000;@\u0003\n\u0005\u0000<=\u0007\u0001\u0000\u0000=?\u0003"+
+		"\n\u0005\u0000><\u0001\u0000\u0000\u0000?B\u0001\u0000\u0000\u0000@>\u0001"+
 		"\u0000\u0000\u0000@A\u0001\u0000\u0000\u0000A\t\u0001\u0000\u0000\u0000"+
 		"B@\u0001\u0000\u0000\u0000CE\u0003\f\u0006\u0000DC\u0001\u0000\u0000\u0000"+
 		"EF\u0001\u0000\u0000\u0000FD\u0001\u0000\u0000\u0000FG\u0001\u0000\u0000"+
@@ -887,7 +885,7 @@ public class PcfParser extends Parser {
 		"\u0010\u0000\u0000JK\u0005\u0003\u0000\u0000KL\u0003\u0000\u0000\u0000"+
 		"LM\u0005\u0004\u0000\u0000MO\u0001\u0000\u0000\u0000NH\u0001\u0000\u0000"+
 		"\u0000NI\u0001\u0000\u0000\u0000NJ\u0001\u0000\u0000\u0000O\r\u0001\u0000"+
-		"\u0000\u0000\u0007\u0011$18@FN";
+		"\u0000\u0000\u0007\u0011*18@FN";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

@@ -1,4 +1,4 @@
-// Generated from /home/jperezr/Documents/LOGIN/Compilation et Interpretation/TP - Interpreter/src/Pcf.g4 by ANTLR 4.13.2
+// Generated from C:/Users/leand/IdeaProjects/COMPIL/src/Pcf.g4 by ANTLR 4.13.2
 package parserANTLR;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
@@ -32,6 +32,13 @@ public class PcfBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements Pc
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
+	@Override public T visitFixFunction(PcfParser.FixFunctionContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
 	@Override public T visitFix(PcfParser.FixContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
@@ -47,13 +54,6 @@ public class PcfBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements Pc
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitFunction(PcfParser.FunctionContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
-	@Override public T visitFixFunction(PcfParser.FixFunctionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

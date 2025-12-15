@@ -41,7 +41,7 @@ object Pcf {
     println(s"annotated AST = $aTerm")
 
     if check_am then
-      val code = Generator.genAM(aTerm)
+      val (code, _) = Generator.genAM(aTerm, 0)
       if verbose then println(s"Code: $code")
       if !check(term, code) then throw Exception("Implementation Error")
     else

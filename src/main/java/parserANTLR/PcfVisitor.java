@@ -1,4 +1,4 @@
-// Generated from /home/jperezr/Documents/LOGIN/Compilation et Interpretation/TP - Interpreter/src/Pcf.g4 by ANTLR 4.13.2
+// Generated from C:/Users/leand/IdeaProjects/COMPIL/src/Pcf.g4 by ANTLR 4.13.2
 package parserANTLR;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
@@ -24,6 +24,13 @@ public interface PcfVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitLet(PcfParser.LetContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code FixFunction}
+	 * labeled alternative in {@link PcfParser#letTerm}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFixFunction(PcfParser.FixFunctionContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code Fix}
 	 * labeled alternative in {@link PcfParser#letTerm}.
 	 * @param ctx the parse tree
@@ -44,13 +51,6 @@ public interface PcfVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitFunction(PcfParser.FunctionContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code FixFunction}
-	 * labeled alternative in {@link PcfParser#funTerm}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitFixFunction(PcfParser.FixFunctionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code BinTerm}
 	 * labeled alternative in {@link PcfParser#funTerm}.
