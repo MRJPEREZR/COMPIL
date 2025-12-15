@@ -36,13 +36,26 @@ contains the actual test suites (provided by the teacher).
 PCF blue, green and red are working totally, while PCF black is partially due to some misbehavior with FIX (it accepts only FUN as argument).
 
 ## For compilation
-Up until this point, only PCF Green and Blue were implemented.
+PCF Green, Blue and partially red and black were implemented.
+
+From [src/main/scala/test/Tests.scala](src/main/scala/test/Tests.scala), we have:
+
+- Green: 10 successful tests out of 10
+- Blue: 11 successful tests out of 11
+- Red: 14 successful tests out of 19
+- Black: 4 successful tests out of 5
+
+There are problems essentially, for red in:
+
+- Curried functions (tests red5.pcf and red6.pcf). The other tests failing have error as expected values and it is getting 0.
+
+And for black:
+
+- Test black2.pcf is failing due to some bugs handling closures and apply in wasm compiled code. 
 
 # Next steps
 
-We are currently working on the compilation of PCF Red.
-For this, we need to record the indices of functions in the WASM call table, which requires adjustments in
-the `genAM` function and the `Mkclos` instruction.
+We need to continue working on red and black issues handling closures and apply in wasm compiled code.
 
 # Use of Generative AI
 
