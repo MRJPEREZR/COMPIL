@@ -12,7 +12,7 @@ trait TestRed {
     test(verbose, "test/red4.pcf", "calling a function defined as a let", Option(44)) //ok
     test(verbose, "test/red40.pcf", "defining 2 functions without using them", Option(3)) //ok
     test(verbose, "test/red41.pcf", "defining 2 functions and using one", Option(2)) //ok
-    test(verbose, "test/red42.pcf", "defining 2 functions and using both", Option(3))
+    test(verbose, "test/red42.pcf", "defining 2 functions and using both", Option(3)) //ok
     test(verbose, "test/red5.pcf", "calling a currified function", Option(55))
     test(verbose, "test/red6.pcf", "calling a currified function", Option(66))
     test(verbose, "test/red7.pcf", "calling a currified function", Option(77)) // ok
