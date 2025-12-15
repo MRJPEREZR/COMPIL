@@ -1,12 +1,10 @@
 (memory 1 10) ;; min max memory (number of 64K pages)
+(type $clos_t (func (result i32)))     ;; function type for closures
 (global $HEAP (mut i32) (i32.const 0)) ;; heap pointer initialized to 0
 (global $ENV  (mut i32) (i32.const 0)) ;; env pointer initialized to NIL
 (global $ACC  (mut i32) (i32.const 999)) ;; accumulator initialized to 999
 (global $LIST i32 (i32.const 1))       ;; LIST tag (for non empty lists)
 (global $NIL  i32 (i32.const 0))       ;; NIL tag (for empty lists)
-
-;; table of closure bodies (start empty)
-(table funcref (elem))
 
 ;; pair(first, second)
 (func $pair (param $first i32) (param $second i32) (result i32)
@@ -69,5 +67,5 @@
   (call $cons)
   (global.set $ENV)
 ;; retrieve index of closure body and execute the body
-(call_indirect (result i32) (i32.load (local.get $C)))
+(call_indirect (type $clos_t) (i32.load (local.get $C)))
 )

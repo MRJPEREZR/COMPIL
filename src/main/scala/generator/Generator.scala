@@ -36,9 +36,7 @@ object Generator:
   def emitTable(size: Int): String =
     // produce a table with all closure function names
     val elems = (0 until size).map(i => s"$$${functionName(i)}").mkString(" ")
-    s"""  (table ${size} funcref
-       |    (elem $elems)
-       |  )""".stripMargin
+    s"""  (table ${size} funcref (elem $elems))"""
 
   def emitFunctions(bodies: List[Code]): String =
     // bodies.zipWithIndex -> emit each function
@@ -47,7 +45,8 @@ object Generator:
     }.mkString("\n\n")
 
   def emitFunction(idx: Int, body: Code, bodies: List[Code]): String =
-    val header = s"  (func $${functionName(idx)} (result i32)"
+    val fname = functionName(idx)
+    val header = s"  (func $$${fname} (result i32)"
     val inner = format(2, emit(body, bodies))
     s"""$header
        |$inner
@@ -207,15 +206,18 @@ object Generator:
     // The table must contain exactly "bodies.length" elements
     val table =
       if bodies.isEmpty then
-        // Empty but legal: table with size 0
         "  (table 0 funcref)"
       else
-        // Emit: (table N funcref (elem $body0 $body1 ...))
-        val elems =
-          bodies.indices.map(i => s"$${body$i}").mkString(" ")
-        s"""  (table ${bodies.length} funcref
-           |    (elem $elems)
-           |  )""".stripMargin
+        val tableDecl =
+          s"  (table ${bodies.length} funcref)"
+
+        val elemDecl =
+          bodies.indices
+            .map(i => s"  (elem (i32.const $i) $$closure$i)")
+            .mkString("\n")
+
+        s"$tableDecl\n$elemDecl"
+
 
     // Emit each closure body as a function definition
     val functions =
