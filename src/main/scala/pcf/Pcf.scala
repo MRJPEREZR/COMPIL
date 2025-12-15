@@ -94,7 +94,9 @@ object Pcf {
     } else {
       // Interactive mode - read from stdin
       println("PCF Interpreter - Type expressions (Ctrl+D to exit):")
-      Iterator.continually(scala.io.StdIn.readLine("> ")).takeWhile(_ != null).toList
+      Iterator.continually(scala.io.StdIn.readLine("> ")).
+        takeWhile(line => line != null && line.nonEmpty).
+        toList
     }
 
     // Process all lines
