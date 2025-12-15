@@ -174,7 +174,7 @@ object Generator:
 
     // function 
     case AFunction(_, body) =>
-      val (bodyCode, newIdx) = genAM(body, idx)
+      val (bodyCode, newIdx) = genAM(body, idx + 1)
       (List(Mkclos(bodyCode, idx)), newIdx)
 
     // application

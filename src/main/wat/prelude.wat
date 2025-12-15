@@ -57,6 +57,10 @@
 ;; closure
 (func $apply (param $C i32) (param $W i32) (result i32)
   (local $e i32)
+  (local $oldENV i32)
+
+  ;; save current ENV
+  (local.set $oldENV (global.get $ENV))
 
   ;; e = closure.env
   (local.set $e
@@ -75,4 +79,7 @@
   (call_indirect (type $clos_t)
     (i32.load (local.get $C))
   )
+
+  ;; restore ENV
+  (global.set $ENV (local.get $oldENV))
 )
