@@ -130,7 +130,7 @@ object Generator:
       if idx < 0 then
         sys.error(s"Mkclos: body not found in bodies list (forgot to collect bodies)")
       List(
-        WAT.Ins(s"(i32.const $index)"),
+        WAT.Ins(s"(i32.const $idx)"),
         WAT.Ins("(global.get $ENV)"),
         WAT.Ins("(call $pair)")
       )
