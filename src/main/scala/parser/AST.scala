@@ -24,9 +24,7 @@ case class ALet(name: String, value: ATerm, in: ATerm) extends ATerm
 case class AFixFunction(name: String, param: String, body: ATerm) extends ATerm
 
 object Term {
-
-  // closure itself.
-  private val CLOS_PLACEHOLDER = "<clos>"
+  
 
   def annotate(term: Term, env: List[String]): ATerm = term match {
 
@@ -42,7 +40,7 @@ object Term {
 
     // fun x -> body
     case Function(param, body) =>
-      val newEnv = param :: CLOS_PLACEHOLDER :: env
+      val newEnv = param :: env
       AFunction(param, annotate(body, newEnv))
 
     // t u
@@ -63,7 +61,7 @@ object Term {
 
     // fix x -> body (to support recursive function)
     case Fix(name, Function(param, body)) =>
-      val newEnv = param :: name :: CLOS_PLACEHOLDER :: env
+      val newEnv = param :: name :: env
       AFixFunction(name, param, AFunction(param, annotate(body, newEnv)))
 
     // fix x -> body (to support just vars)

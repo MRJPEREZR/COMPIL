@@ -13,17 +13,17 @@ trait TestRed {
     test(verbose, "test/red40.pcf", "defining 2 functions without using them", Option(3)) //ok
     test(verbose, "test/red41.pcf", "defining 2 functions and using one", Option(2)) //ok
     test(verbose, "test/red42.pcf", "defining 2 functions and using both", Option(3)) //ok
-    test(verbose, "test/red5.pcf", "calling a currified function", Option(55))
-    test(verbose, "test/red6.pcf", "calling a currified function", Option(66))
+    test(verbose, "test/red5.pcf", "calling a currified function", Option(55)) // ok
+    test(verbose, "test/red6.pcf", "calling a currified function", Option(66)) // ok
     test(verbose, "test/red7.pcf", "calling a currified function", Option(77)) // ok
 
-    test(verbose, "test/red11.pcf", "type error", None) // //evaluated to 0
+    test(verbose, "test/red11.pcf", "type error", None) //ok
     test(verbose, "test/red13.pcf", "function/ifz typing", Some(1)) //ok
     test(verbose, "test/red14.pcf", "function/ifz typing", Some(11)) //ok
     test(verbose, "test/red15.pcf", "function/ifz typing", Some(11)) //ok
     test(verbose, "test/red16.pcf", "function/ifz typing", Some(16)) //ok
     test(verbose, "test/red17.pcf", "static scope", Some(2)) //ok
-    test(verbose, "test/red18.pcf", "type error", None) //evaluated to 0
+    test(verbose, "test/red18.pcf", "type error", None) //ok
     test(verbose, "test/red19.pcf", "type error", None) //evaluated to 0
     report()
   }

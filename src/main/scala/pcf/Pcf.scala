@@ -36,6 +36,7 @@ object Pcf {
 
   def compile(verbose: Boolean, check_am: Boolean, in: String, filename: Option[String]): Unit =
     val term = parseTerm(in)
+    val typ = Typer.eval(term, Map())
     val aTerm = Term.annotate(term, List())
     print(s"file name: $filename \n")
     println(s"annotated AST = $aTerm")
